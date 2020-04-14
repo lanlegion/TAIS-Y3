@@ -23,7 +23,7 @@ const SIZES = {
 };
 
 class Simulation {
-  constructor(width, height, numberOfColonies, antsPerColony, gameSpeed, foodStacksCount, foodStackSize, antRange, homePheromoneDecay, foodPheromoneDacay) {
+  constructor(width, height, numberOfColonies, antsPerColony, gameSpeed, foodStacksCount, foodStackSize, antRange, homePheromoneDecay, foodPheromoneDecay) {
     console.log(`Initializing Simulation width=${width} height=${height} 
     numberOfColonies=${numberOfColonies} antPerColony=${antsPerColony}`);
 
@@ -36,7 +36,7 @@ class Simulation {
     this.foodStackSize = foodStackSize;
     this.antRange = antRange;
     this.homePheromoneDecay = homePheromoneDecay;
-    this.foodPheromoneDecay = foodPheromoneDacay;
+    this.foodPheromoneDecay = foodPheromoneDecay;
 
     this._initCells();
     this._initHomes();
@@ -45,18 +45,6 @@ class Simulation {
     this._initFoodStacks();
 
     console.log('Simulation initialization complete!');
-  }
-
-  _initHomes() {
-    console.log('Initializing homes');
-    this.homes = [];
-    for (let colony = 0; colony < this.numberOfColonies; colony++) {
-      const xHome = 1 + int(Math.random() * this.width);
-      const yHome = 1 + int(Math.random() * this.height);
-      const newHome = new Cell(xHome, yHome);
-      newHome.type = CellType.HOME;
-      this.homes.push(newHome);
-    }
   }
 
   _initCells() {
@@ -68,6 +56,18 @@ class Simulation {
         row.push(new Cell(x, y));
       }
       this.cells.push(row);
+    }
+  }
+
+  _initHomes() {
+    console.log('Initializing homes');
+    this.homes = [];
+    for (let colony = 0; colony < this.numberOfColonies; colony++) {
+      const xHome = 1 + int(Math.random() * this.width);
+      const yHome = 1 + int(Math.random() * this.height);
+      const newHome = this.getCell(xHome, yHome);
+      newHome.type = CellType.HOME;
+      this.homes.push(newHome);
     }
   }
 
