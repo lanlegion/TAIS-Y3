@@ -23,7 +23,7 @@ const SIZES = {
 };
 
 class Simulation {
-  constructor(width, height, numberOfColonies, antsPerColony, gameSpeed, foodStacksCount, foodStackSize, antRange) {
+  constructor(width, height, numberOfColonies, antsPerColony, gameSpeed, foodStacksCount, foodStackSize, antRange, homePheromoneDecay, foodPheromoneDacay) {
     console.log(`Initializing Simulation width=${width} height=${height} 
     numberOfColonies=${numberOfColonies} antPerColony=${antsPerColony}`);
 
@@ -35,6 +35,8 @@ class Simulation {
     this.foodStacksCount = foodStacksCount;
     this.foodStackSize = foodStackSize;
     this.antRange = antRange;
+    this.homePheromoneDecay = homePheromoneDecay;
+    this.foodPheromoneDecay = foodPheromoneDacay;
 
     this._initCells();
     this._initHomes();
@@ -129,6 +131,7 @@ class Simulation {
   run() {
     this.ants.forEach(colony => {
       colony.forEach(ant => {
+        const currentCell = this.getCell(ant.x, ant.y);
         if (ant.isDead) {
           //TODO
           console.log('DEAD ANT');
@@ -162,31 +165,24 @@ class Simulation {
             ant.searchForFood();
           }
         }
-        // if (ant.isDead) {
-        //   //TODO
-        // } else {
-        //   const forward = ant.forward();
-        //   const forwardCell = this.getCell(forward.x, forward.y);
-        //
-        //   if (forwardCell === null) {
-        //     ant.randomizeDirection();
-        //   } else if (ant.carryingFood) {
-        //     if (forwardCell.type === CellType.HOME) {
-        //       ant.carryingFood = false;
-        //       ant.turnAround();
-        //       ant.searchForFood();
-        //     } else {
-        //       ant.searchForHome();
-        //     }
-        //   } else if (forwardCell.type === CellType.FOOD) {
-        //     // Looking for food
-        //     ant.carryingFood = true;
-        //     ant.turnAround();
-        //     ant.searchForHome();
-        //   } else {
-        //     ant.searchForFood();
-        //   }
-        // }
+        if (!ant.isDead && (ant.x !== currentCell.x || ant.y !== currentCell.y)) {
+          if (ant.carryingFood) {
+            currentCell.pheromones.food += 1;
+          } else {
+            currentCell.pheromones.home += 1;
+          }
+        }
+      });
+    });
+
+    this.cells.forEach(row => {
+      row.forEach(cell => {
+        if (cell.pheromones.home > 0) {
+          cell.pheromones.home *= this.homePheromoneDecay;
+        }
+        if (cell.pheromones.food > 0) {
+          cell.pheromones.food *= this.foodPheromoneDecay;
+        }
       })
     })
   }
