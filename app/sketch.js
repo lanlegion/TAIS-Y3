@@ -1,11 +1,11 @@
 const WIDTH = 1000;
 const HEIGHT = 600;
 const FPS = 60;
-const NUMBER_OF_COLONIES = 5; // Max 5
-const ANTS_PER_COLONY = 200;
-const FOOD_STACKS = 20;
+const NUMBER_OF_COLONIES = 1; // Max 5
+const ANTS_PER_COLONY = 100;
+const FOOD_STACKS = 30;
 const FOOD_STACK_SIZE = 10;
-const GAME_SPEED = 0.4;
+const GAME_SPEED = 1;
 
 let simulation;
 

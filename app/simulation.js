@@ -23,7 +23,7 @@ const SIZES = {
 };
 
 class Simulation {
-  constructor(width, height, numberOfColonies, antsPerColony, gameSpeed, foodStacksCount, foodStackSize) {
+  constructor(width, height, numberOfColonies, antsPerColony, gameSpeed, foodStacksCount, foodStackSize, antRange) {
     console.log(`Initializing Simulation width=${width} height=${height} 
     numberOfColonies=${numberOfColonies} antPerColony=${antsPerColony}`);
 
@@ -34,6 +34,7 @@ class Simulation {
     this.gameSpeed = gameSpeed;
     this.foodStacksCount = foodStacksCount;
     this.foodStackSize = foodStackSize;
+    this.antRange = antRange;
 
     this._initCells();
     this._initHomes();
@@ -75,12 +76,13 @@ class Simulation {
       this.ants.push([]);
       const home = this.homes[colony];
       for (let ant = 0; ant < this.antPerColony; ant++) {
-        this.ants[colony].push(new Ant(home.x, home.y));
+        this.ants[colony].push(new Ant(home.x, home.y, this));
       }
     }
   }
 
   _initColoniesColors() {
+    console.log('Initializing colonies colors');
     this.colonyColors = [];
     for (let colony = 0; colony < this.numberOfColonies; colony++) {
       const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
@@ -104,10 +106,87 @@ class Simulation {
     }
   }
 
+  getCell(x, y) {
+    if (x < 0 || x >= this.width) {
+      return null;
+    }
+    if (y < 0 || y >= this.height) {
+      return null;
+    }
+
+    return this.cells[x][y];
+  }
+
+  clearFood(cell) {
+    cell.type = CellType.EMPTY;
+    let index = this.foods.indexOf(cell);
+    if (index !== -1) {
+      this.foods.splice(index, 1);
+    }
+  }
+
+
   run() {
     this.ants.forEach(colony => {
       colony.forEach(ant => {
-        ant.moveRandomly(this.gameSpeed);
+        if (ant.isDead) {
+          //TODO
+          console.log('DEAD ANT');
+        } else if (ant.carryingFood) {
+          const forwardDirectionsStraight = ant.forwardDirections()[1];
+          const forwardCell = this.getCell(ant.x + forwardDirectionsStraight.x, ant.y + forwardDirectionsStraight.y);
+
+          if (forwardCell === null) {
+            ant.randomizeDirection();
+          } else if (forwardCell.type === CellType.HOME) {
+            console.log('Ant dropped home FOOD!');
+            ant.carryingFood = false;
+            ant.turnAround();
+            ant.searchForFood();
+          } else {
+            ant.searchForHome();
+          }
+        } else {
+          const forwardDirectionsStraight = ant.forwardDirections()[1];
+          const forwardCell = this.getCell(ant.x + forwardDirectionsStraight.x, ant.y + forwardDirectionsStraight.y);
+
+          if (forwardCell === null) {
+            ant.randomizeDirection();
+          } else if (forwardCell.type === CellType.FOOD) {
+            console.log('Ant picked up FOOD!');
+            ant.carryingFood = true;
+            ant.turnAround();
+            this.clearFood(forwardCell);
+            ant.searchForHome();
+          } else {
+            ant.searchForFood();
+          }
+        }
+        // if (ant.isDead) {
+        //   //TODO
+        // } else {
+        //   const forward = ant.forward();
+        //   const forwardCell = this.getCell(forward.x, forward.y);
+        //
+        //   if (forwardCell === null) {
+        //     ant.randomizeDirection();
+        //   } else if (ant.carryingFood) {
+        //     if (forwardCell.type === CellType.HOME) {
+        //       ant.carryingFood = false;
+        //       ant.turnAround();
+        //       ant.searchForFood();
+        //     } else {
+        //       ant.searchForHome();
+        //     }
+        //   } else if (forwardCell.type === CellType.FOOD) {
+        //     // Looking for food
+        //     ant.carryingFood = true;
+        //     ant.turnAround();
+        //     ant.searchForHome();
+        //   } else {
+        //     ant.searchForFood();
+        //   }
+        // }
       })
     })
   }
