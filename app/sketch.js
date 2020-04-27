@@ -1,14 +1,14 @@
-const WIDTH = 500;
-const HEIGHT = 500;
+const WIDTH = 300;
+const HEIGHT = 300;
 const FPS = 60;
-const NUMBER_OF_COLONIES = 1;
+const NUMBER_OF_COLONIES = 4;
 const ANTS_PER_COLONY = 100;
 const FOOD_STACKS = 30;
 const FOOD_STACK_SIZE = 10;
 const GAME_SPEED = 1;
 const FOOD_PHEROMONE_DECAY = 0.99;
 const HOME_PHEROMONE_DECAY = 0.99;
-const ANT_RANGE = 6;
+const ANT_RANGE = 5;
 
 const COLORS = {
   HOME_COLOR: '#31536b',
@@ -21,8 +21,8 @@ const COLORS = {
 
 const SIZES = {
   HOME: {
-    x: 10,
-    y: 10,
+    x: 15,
+    y: 15,
   },
   ANT: {
     x: 2,

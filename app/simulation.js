@@ -1,6 +1,8 @@
 class Simulation {
   constructor(simulationConfig, drawingConfig, probabilityConfig) {
     console.log(`Simulation configuration: ${JSON.stringify(simulationConfig, undefined, 2)}`);
+    console.log(`Drawing configuration: ${JSON.stringify(drawingConfig, undefined, 2)}`);
+    console.log(`Probability configuration: ${JSON.stringify(probabilityConfig, undefined, 2)}`);
 
     this.simulationConfig = simulationConfig;
     this.drawingConfig = drawingConfig;
@@ -47,7 +49,7 @@ class Simulation {
       this.ants.push([]);
       for (let ant = 0; ant < this.simulationConfig.antsPerColony; ant++) {
         const initialPosition = this._getInitialPositionForAnt(colony);
-        this.ants[colony].push(new Ant(initialPosition.x, initialPosition.y, this));
+        this.ants[colony].push(new Ant(initialPosition.x, initialPosition.y, colony, this));
       }
     }
   }
@@ -173,9 +175,11 @@ class Simulation {
         }
         if (!ant.isDead && (ant.x !== currentCell.x || ant.y !== currentCell.y)) {
           if (ant.carryingFood) {
-            currentCell.pheromones.food += 1;
+            // currentCell.pheromones.food += 1;
+            currentCell.addFoodPheromone(1, ant.colony);
           } else {
-            currentCell.pheromones.home += 1;
+            // currentCell.pheromones.home += 1;
+            currentCell.addHomePheromone(1, ant.colony);
           }
         }
       });
@@ -183,13 +187,7 @@ class Simulation {
 
     this.cells.forEach(row => {
       row.forEach(cell => {
-        if (cell.pheromones.home > 0) {
-          cell.pheromones.home *= this.simulationConfig.homePheromoneDecay;
-        }
-        if (cell.pheromones.food > 0) {
-          cell.pheromones.food *= this.simulationConfig.foodPheromoneDecay;
-        }
-      })
+        cell.decayPheromones(this.simulationConfig.foodPheromoneDecay, this.simulationConfig.homePheromoneDecay) })
     })
   }
 

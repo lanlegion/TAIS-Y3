@@ -64,9 +64,10 @@ class ProbabilityConfig {
 }
 
 class Ant {
-  constructor(x, y, simulation) {
+  constructor(x, y, colony, simulation) {
     this.x = x;
     this.y = y;
+    this.colony = colony;
     this.angle = 0;
     this.carryingFood = false;
     this.isDead = false;
@@ -195,13 +196,13 @@ class Ant {
         if (cell.type === CellType.FOOD) {
           return 100;
         } else {
-          return cell.pheromones.food;
+          return cell.getFoodPheromone(this.colony);
         }
       } else {
         if (cell.type === CellType.HOME) {
           return 100;
         } else {
-          return cell.pheromones.home;
+          return cell.getHomePheromone(this.colony);
         }
       }
     }
@@ -209,9 +210,9 @@ class Ant {
 }
 
 class Pheromones {
-  constructor(food = 0, home = 0) {
-    this.food = food;
-    this.home = home;
+  constructor() {
+    this.food = {};
+    this.home = {};
   }
 }
 
@@ -228,5 +229,44 @@ class Cell {
     this.y = y;
     this.type = CellType.EMPTY;
     this.pheromones = new Pheromones();
+  }
+
+  addFoodPheromone(value, colony) {
+    if (!this.pheromones.food.hasOwnProperty(colony)) {
+      this.pheromones.food[colony] = 0.0;
+    }
+    this.pheromones.food[colony] += value;
+  }
+
+  addHomePheromone(value, colony) {
+    if (!this.pheromones.home.hasOwnProperty(colony)) {
+      this.pheromones.home[colony] = 0.0;
+    }
+    this.pheromones.home[colony] += value;
+  }
+
+  decayPheromones(foodDecay, homeDecay) {
+    Object.keys(this.pheromones.food).forEach(key => {
+      this.pheromones.food[key] *= foodDecay;
+    });
+    Object.keys(this.pheromones.home).forEach(key => {
+      this.pheromones.home[key] *= homeDecay;
+    });
+  }
+
+  getFoodPheromone(colony) {
+    const pheromone = this.pheromones.food[colony];
+    if (pheromone === undefined) {
+      return 0;
+    }
+    return pheromone;
+  }
+
+  getHomePheromone(colony) {
+    const pheromone = this.pheromones.home[colony];
+    if (pheromone === undefined) {
+      return 0;
+    }
+    return pheromone;
   }
 }
