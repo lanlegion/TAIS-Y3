@@ -30,9 +30,7 @@ class Simulation {
     console.log('Initializing homes');
     this.homes = [];
     for (let colony = 0; colony < this.simulationConfig.numberOfColonies; colony++) {
-      const xHome = 1 + int(Math.random() * this.simulationConfig.mapWidth);
-      const yHome = 1 + int(Math.random() * this.simulationConfig.mapHeight);
-      const newHome = this.getCell(xHome, yHome);
+      const newHome = this._getRandomCell();
       newHome.type = CellType.HOME;
       this.homes.push(newHome);
     }
@@ -54,8 +52,7 @@ class Simulation {
     console.log('Initializing colonies colors');
     this.colonyColors = [];
     for (let colony = 0; colony < this.simulationConfig.numberOfColonies; colony++) {
-      const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
-      this.colonyColors.push(randomColor);
+      this.colonyColors.push(this._getRandomColorString());
     }
   }
 
@@ -63,16 +60,33 @@ class Simulation {
     console.log('Initializing food stacks');
     this.foods = [];
     for (let food = 0; food < this.simulationConfig.numberOfFoodStacks; food++) {
-      const xFood = 1 + int(Math.random() * this.simulationConfig.mapWidth);
-      const yFood = 1 + int(Math.random() * this.simulationConfig.mapHeight);
-      for (let x = xFood; x < xFood + this.simulationConfig.foodStackSize && x < this.simulationConfig.mapWidth; x++) {
-        for (let y = yFood; y < yFood + this.simulationConfig.foodStackSize && y < this.simulationConfig.mapHeight; y++) {
+      const randomLocation = this._getRandomLocationOnMap();
+      for (let x = randomLocation.x;
+           x < randomLocation.x + this.simulationConfig.foodStackSize && x < this.simulationConfig.mapWidth; x++) {
+        for (let y = randomLocation.y;
+             y < randomLocation.y + this.simulationConfig.foodStackSize && y < this.simulationConfig.mapHeight; y++) {
           const currentCell = this.cells[x][y];
           currentCell.type = CellType.FOOD;
           this.foods.push(currentCell);
         }
       }
     }
+  }
+
+  _getRandomCell() {
+    const randomLocation = this._getRandomLocationOnMap();
+    return this.getCell(randomLocation.x, randomLocation.y);
+  }
+
+  _getRandomLocationOnMap() {
+    return {
+      x: 1 + int(Math.random() * this.simulationConfig.mapWidth),
+      y: 1 + int(Math.random() * this.simulationConfig.mapHeight)
+    }
+  }
+
+  _getRandomColorString() {
+    return '#' + Math.floor(Math.random() * 16777215).toString(16);
   }
 
   getCell(x, y) {
@@ -93,7 +107,6 @@ class Simulation {
       this.foods.splice(index, 1);
     }
   }
-
 
   run() {
     this.ants.forEach(colony => {

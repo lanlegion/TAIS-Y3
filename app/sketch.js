@@ -1,7 +1,7 @@
 const WIDTH = 500;
 const HEIGHT = 500;
 const FPS = 60;
-const NUMBER_OF_COLONIES = 1; // Max 5
+const NUMBER_OF_COLONIES = 1;
 const ANTS_PER_COLONY = 100;
 const FOOD_STACKS = 30;
 const FOOD_STACK_SIZE = 10;
