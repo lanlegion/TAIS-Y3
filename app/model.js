@@ -1,3 +1,55 @@
+class SimulationConfig {
+  constructor(
+    mapWidth,
+    mapHeight,
+    fps,
+    numberOfColonies,
+    antsPerColony,
+    numberOfFoodStacks,
+    foodStackSize,
+    gameSpeed,
+    foodPheromoneDecay,
+    homePheromoneDecay,
+    antRange
+  ) {
+    this.mapWidth = mapWidth;
+    this.mapHeight = mapHeight;
+    this.fps = fps;
+    this.numberOfColonies = numberOfColonies;
+    this.antsPerColony = antsPerColony;
+    this.numberOfFoodStacks = numberOfFoodStacks;
+    this.foodStackSize = foodStackSize;
+    this.gameSpeed = gameSpeed;
+    this.foodPheromoneDecay = foodPheromoneDecay;
+    this.homePheromoneDecay = homePheromoneDecay;
+    this.antRange = antRange;
+  }
+}
+
+class DrawingConfig {
+  constructor(
+    homeColor,
+    foodColor,
+    backgroundColor,
+    antColor,
+    deadAntColor,
+    antWithFoodColor,
+    homeSize,
+    antSize,
+    foodSize
+  ) {
+    this.homeColor = homeColor;
+    this.foodColor = foodColor;
+    this.backgroundColor = backgroundColor;
+    this.antColor = antColor;
+    this.deadAntColor = deadAntColor;
+    this.antWithFoodColor = antWithFoodColor;
+    this.homeSize = homeSize;
+    this.antSize = antSize;
+    this.foodSize = foodSize;
+  }
+}
+
 class Ant {
   constructor(x, y, simulation) {
     this.x = x;
@@ -64,8 +116,8 @@ class Ant {
     let action = floor(random(0, 6));
     //Slightly more likely to move forwards than to turn
     if (action < 4) {
-      this.x += fwd.x * simulation.gameSpeed;
-      this.y += fwd.y * simulation.gameSpeed;
+      this.x += fwd.x * simulation.simulationConfig.gameSpeed;
+      this.y += fwd.y * simulation.simulationConfig.gameSpeed;
     } else if (action === 4) {
       this.turnLeft();
     } else if (action === 5) {
@@ -107,7 +159,7 @@ class Ant {
   }
 
   getScoreForDirection(direction, lookingForFood) {
-    const range = simulation.antRange;
+    const range = simulation.simulationConfig.antRange;
     const x0 = this.x + direction.x * range;
     const y0 = this.y + direction.y * range;
     let score = 0;
@@ -146,7 +198,6 @@ class Ant {
   }
 }
 
-
 class Pheromones {
   constructor(food = 0, home = 0) {
     this.food = food;
@@ -160,7 +211,6 @@ const CellType = {
   HOME: 2,
   WALL: 3
 };
-
 
 class Cell {
   constructor(x, y) {
