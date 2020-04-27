@@ -1,9 +1,10 @@
 class Simulation {
-  constructor(simulationConfig, drawingConfig) {
+  constructor(simulationConfig, drawingConfig, probabilityConfig) {
     console.log(`Simulation configuration: ${JSON.stringify(simulationConfig, undefined, 2)}`);
 
     this.simulationConfig = simulationConfig;
     this.drawingConfig = drawingConfig;
+    this.probabilityConfig = probabilityConfig;
 
     this._initCells();
     this._initHomes();
@@ -30,9 +31,12 @@ class Simulation {
     console.log('Initializing homes');
     this.homes = [];
     for (let colony = 0; colony < this.simulationConfig.numberOfColonies; colony++) {
-      const newHome = this._getRandomCell();
-      newHome.type = CellType.HOME;
-      this.homes.push(newHome);
+      let colonyHomes = [];
+      this._gatRandomSquareLocations().forEach(cell => {
+        cell.type = CellType.HOME;
+        colonyHomes.push(cell);
+      });
+      this.homes.push(colonyHomes);
     }
   }
 
@@ -41,9 +45,9 @@ class Simulation {
     this.ants = [];
     for (let colony = 0; colony < this.simulationConfig.numberOfColonies; colony++) {
       this.ants.push([]);
-      const home = this.homes[colony];
       for (let ant = 0; ant < this.simulationConfig.antsPerColony; ant++) {
-        this.ants[colony].push(new Ant(home.x, home.y, this));
+        const initialPosition = this._getInitialPositionForAnt(colony);
+        this.ants[colony].push(new Ant(initialPosition.x, initialPosition.y, this));
       }
     }
   }
@@ -85,8 +89,30 @@ class Simulation {
     }
   }
 
+  _gatRandomSquareLocations() {
+    let randomCells = [];
+    const randomLocation = this._getRandomLocationOnMap();
+    for (let x = randomLocation.x; x < randomLocation.x + this.drawingConfig.homeSize.x; x++) {
+      for (let y = randomLocation.y; y < randomLocation.y + this.drawingConfig.homeSize.y; y++) {
+        const newCell = this.getCell(x, y);
+        if (newCell !== null) {
+          randomCells.push(newCell);
+        }
+      }
+    }
+    return randomCells;
+  }
+
   _getRandomColorString() {
     return '#' + Math.floor(Math.random() * 16777215).toString(16);
+  }
+
+  _getInitialPositionForAnt(colony) {
+    const randomHomeCell = this.homes[colony][Math.floor(Math.random() * this.homes[colony].length)];
+    return {
+      x: randomHomeCell.x,
+      y: randomHomeCell.y
+    }
   }
 
   getCell(x, y) {
@@ -122,7 +148,7 @@ class Simulation {
           if (forwardCell === null) {
             ant.randomizeDirection();
           } else if (forwardCell.type === CellType.HOME) {
-            console.log('Ant dropped home FOOD!');
+            // console.log('Ant dropped home FOOD!');
             ant.carryingFood = false;
             ant.turnAround();
             ant.searchForFood();
@@ -136,7 +162,7 @@ class Simulation {
           if (forwardCell === null) {
             ant.randomizeDirection();
           } else if (forwardCell.type === CellType.FOOD) {
-            console.log('Ant picked up FOOD!');
+            // console.log('Ant picked up FOOD!');
             ant.carryingFood = true;
             ant.turnAround();
             this.clearFood(forwardCell);
@@ -171,9 +197,11 @@ class Simulation {
     background(this.drawingConfig.backgroundColor);
     noStroke();
 
-    this.homes.forEach((home, index) => {
+    this.homes.forEach((cells, index) => {
       fill(this.colonyColors[index]);
-      ellipse(home.x, home.y, this.drawingConfig.homeSize.X, this.drawingConfig.homeSize.Y);
+      cells.forEach(cell => {
+        rect(cell.x, cell.y, 1, 1);
+      });
     });
 
     this.ants.forEach((colony, index) => {
@@ -185,13 +213,13 @@ class Simulation {
           antColor = this.drawingConfig.antWithFoodColor;
         }
         fill(antColor);
-        rect(ant.x, ant.y, this.drawingConfig.antSize.X, this.drawingConfig.antSize.Y);
+        rect(ant.x, ant.y, this.drawingConfig.antSize.x, this.drawingConfig.antSize.y);
       })
     });
 
     fill(this.drawingConfig.foodColor);
     this.foods.forEach(foodCell => {
-      rect(foodCell.x, foodCell.y, this.drawingConfig.foodSize.X, this.drawingConfig.foodSize.Y);
+      rect(foodCell.x, foodCell.y, this.drawingConfig.foodSize.x, this.drawingConfig.foodSize.y);
     });
   }
 }

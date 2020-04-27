@@ -8,7 +8,7 @@ const FOOD_STACK_SIZE = 10;
 const GAME_SPEED = 1;
 const FOOD_PHEROMONE_DECAY = 0.99;
 const HOME_PHEROMONE_DECAY = 0.99;
-const ANT_RANGE = 4;
+const ANT_RANGE = 6;
 
 const COLORS = {
   HOME_COLOR: '#31536b',
@@ -21,16 +21,16 @@ const COLORS = {
 
 const SIZES = {
   HOME: {
-    X: 20,
-    Y: 20,
+    x: 10,
+    y: 10,
   },
   ANT: {
-    X: 2,
-    Y: 2,
+    x: 2,
+    y: 2,
   },
   FOOD: {
-    X: 1,
-    Y: 1,
+    x: 1,
+    y: 1,
   }
 };
 
@@ -66,7 +66,13 @@ function setup() {
     SIZES.FOOD
   );
 
-  simulation = new Simulation(simulationConfig, drawingConfig);
+  const probabilityConfig = new ProbabilityConfig(
+    0.75,
+    0.2,
+    0.01
+  );
+
+  simulation = new Simulation(simulationConfig, drawingConfig, probabilityConfig);
 }
 
 function draw() {

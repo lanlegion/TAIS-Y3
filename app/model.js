@@ -50,6 +50,19 @@ class DrawingConfig {
   }
 }
 
+class ProbabilityConfig {
+  constructor(
+    maintainDirectionOnRandom,
+    moveRandomWhileSeeking,
+    minScoreLimit
+  ) {
+    this.maintainDirectionOnRandom = maintainDirectionOnRandom;
+    this.turnLeftOnRandom = maintainDirectionOnRandom + (1 - maintainDirectionOnRandom) / 2;
+    this.moveRandomWhileSeeking = moveRandomWhileSeeking;
+    this.minScoreLimit = minScoreLimit;
+  }
+}
+
 class Ant {
   constructor(x, y, simulation) {
     this.x = x;
@@ -77,9 +90,6 @@ class Ant {
     return this.directions[this.angle];
   }
 
-  /**
-   * @return [left forward cell, forward cell, right forward cell]
-   */
   forwardDirections() {
     const fwd = this.directions[this.angle];
     const i = this.angle;
@@ -113,14 +123,13 @@ class Ant {
 
   moveRandomly() {
     let fwd = this.forward();
-    let action = floor(random(0, 6));
-    //Slightly more likely to move forwards than to turn
-    if (action < 4) {
+    let probability = Math.random();
+    if (probability < simulation.probabilityConfig.maintainDirectionOnRandom) {
       this.x += fwd.x * simulation.simulationConfig.gameSpeed;
       this.y += fwd.y * simulation.simulationConfig.gameSpeed;
-    } else if (action === 4) {
+    } else if (probability < simulation.probabilityConfig.turnLeftOnRandom) {
       this.turnLeft();
-    } else if (action === 5) {
+    } else {
       this.turnRight();
     }
   }
@@ -146,7 +155,8 @@ class Ant {
       }
     });
 
-    if (maxScore < 0.01 || random(1) < 0.2) {
+    if (maxScore < this.simulation.probabilityConfig.minScoreLimit
+      || Math.random() < this.simulation.probabilityConfig.moveRandomWhileSeeking) {
       this.moveRandomly();
     } else if (bestDirection === forwardDirections[0]) {
       this.turnLeft();
