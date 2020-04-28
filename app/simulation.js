@@ -1,5 +1,5 @@
 class Simulation {
-  constructor(simulationConfig, drawingConfig, probabilityConfig) {
+  constructor(simulationConfig, drawingConfig, probabilityConfig, uiComponents) {
     console.log(`Simulation configuration: ${JSON.stringify(simulationConfig, undefined, 2)}`);
     console.log(`Drawing configuration: ${JSON.stringify(drawingConfig, undefined, 2)}`);
     console.log(`Probability configuration: ${JSON.stringify(probabilityConfig, undefined, 2)}`);
@@ -7,6 +7,9 @@ class Simulation {
     this.simulationConfig = simulationConfig;
     this.drawingConfig = drawingConfig;
     this.probabilityConfig = probabilityConfig;
+    this.uiComponents = uiComponents;
+
+    this.tick = 0;
 
     this._initCells();
     this._initHomes();
@@ -45,7 +48,9 @@ class Simulation {
   _initAnts() {
     console.log('Initializing ants');
     this.ants = [];
+    this.colonies = [];
     for (let colony = 0; colony < this.simulationConfig.numberOfColonies; colony++) {
+      this.colonies.push(new ColonyStats(colony, this.simulationConfig.antsPerColony));
       this.ants.push([]);
       for (let ant = 0; ant < this.simulationConfig.antsPerColony; ant++) {
         const initialPosition = this._getInitialPositionForAnt(colony);
@@ -137,58 +142,69 @@ class Simulation {
   }
 
   run() {
+    this.tick++;
     this.ants.forEach(colony => {
       colony.forEach(ant => {
         const currentCell = this.getCell(ant.x, ant.y);
         if (ant.isDead) {
-          //TODO
-          console.log('DEAD ANT');
+          // Todo: implement
         } else if (ant.carryingFood) {
-          const forwardDirectionsStraight = ant.forwardDirections()[1];
-          const forwardCell = this.getCell(ant.x + forwardDirectionsStraight.x, ant.y + forwardDirectionsStraight.y);
-
-          if (forwardCell === null) {
-            ant.randomizeDirection();
-          } else if (forwardCell.type === CellType.HOME) {
-            // console.log('Ant dropped home FOOD!');
-            ant.carryingFood = false;
-            ant.turnAround();
-            ant.searchForFood();
-          } else {
-            ant.searchForHome();
-          }
+          this.moveAntTowardsHome(ant);
         } else {
-          const forwardDirectionsStraight = ant.forwardDirections()[1];
-          const forwardCell = this.getCell(ant.x + forwardDirectionsStraight.x, ant.y + forwardDirectionsStraight.y);
-
-          if (forwardCell === null) {
-            ant.randomizeDirection();
-          } else if (forwardCell.type === CellType.FOOD) {
-            // console.log('Ant picked up FOOD!');
-            ant.carryingFood = true;
-            ant.turnAround();
-            this.clearFood(forwardCell);
-            ant.searchForHome();
-          } else {
-            ant.searchForFood();
-          }
+          this.moveAntTowardsFood(ant);
         }
-        if (!ant.isDead && (ant.x !== currentCell.x || ant.y !== currentCell.y)) {
-          if (ant.carryingFood) {
-            // currentCell.pheromones.food += 1;
-            currentCell.addFoodPheromone(1, ant.colony);
-          } else {
-            // currentCell.pheromones.home += 1;
-            currentCell.addHomePheromone(1, ant.colony);
-          }
-        }
+        this.antLeavesPheromone(ant, currentCell)
       });
     });
 
+    // Todo: improvement - memorize cells with pheromone and iterate only those
     this.cells.forEach(row => {
       row.forEach(cell => {
-        cell.decayPheromones(this.simulationConfig.foodPheromoneDecay, this.simulationConfig.homePheromoneDecay) })
+        cell.decayPheromones(this.simulationConfig.foodPheromoneDecay, this.simulationConfig.homePheromoneDecay)
+      })
     })
+  }
+
+  moveAntTowardsHome(ant) {
+    const forwardDirectionsStraight = ant.forwardDirections()[1];
+    const forwardCell = this.getCell(ant.x + forwardDirectionsStraight.x, ant.y + forwardDirectionsStraight.y);
+
+    if (forwardCell === null) {
+      ant.randomizeDirection();
+    } else if (forwardCell.type === CellType.HOME) {
+      ant.carryingFood = false;
+      this.colonies[ant.colony].food += 1;
+      ant.turnAround();
+      ant.searchForFood();
+    } else {
+      ant.searchForHome();
+    }
+  }
+
+  moveAntTowardsFood(ant) {
+    const forwardDirectionsStraight = ant.forwardDirections()[1];
+    const forwardCell = this.getCell(ant.x + forwardDirectionsStraight.x, ant.y + forwardDirectionsStraight.y);
+
+    if (forwardCell === null) {
+      ant.randomizeDirection();
+    } else if (forwardCell.type === CellType.FOOD) {
+      ant.carryingFood = true;
+      ant.turnAround();
+      this.clearFood(forwardCell);
+      ant.searchForHome();
+    } else {
+      ant.searchForFood();
+    }
+  }
+
+  antLeavesPheromone(ant, currentCell) {
+    if (!ant.isDead && (ant.x !== currentCell.x || ant.y !== currentCell.y)) {
+      if (ant.carryingFood) {
+        currentCell.addFoodPheromone(1, ant.colony);
+      } else {
+        currentCell.addHomePheromone(1, ant.colony);
+      }
+    }
   }
 
   draw() {
@@ -219,5 +235,15 @@ class Simulation {
     this.foods.forEach(foodCell => {
       rect(foodCell.x, foodCell.y, this.drawingConfig.foodSize.x, this.drawingConfig.foodSize.y);
     });
+
+    this.uiComponents.statsDiv.html(this.statsHtmlString());
+  }
+
+  statsHtmlString() {
+    let prettyString = '';
+    this.colonies.forEach((colonyStats, index) => {
+      prettyString += `<span style="color:${this.colonyColors[index]}">Colony id: ${colonyStats.index}   Food: ${colonyStats.food} <br></span>`
+    });
+    return prettyString;
   }
 }

@@ -221,7 +221,7 @@ const CellType = {
   FOOD: 1,
   HOME: 2,
   WALL: 3
-};
+}
 
 class Cell {
   constructor(x, y) {
@@ -268,5 +268,28 @@ class Cell {
       return 0;
     }
     return pheromone;
+  }
+}
+
+class ColonyStats {
+  constructor(index, numberOfAnts) {
+    this.index = index;
+    this.nuberOfAnts = numberOfAnts;
+    this.food = 0;
+    this.age = 0;
+  }
+
+  storeFood() {
+    this.food++;
+  }
+
+  aging() {
+    this.age++;
+  }
+}
+
+class UiComponents {
+  constructor(statsDiv) {
+    this.statsDiv = statsDiv;
   }
 }

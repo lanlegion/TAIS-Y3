@@ -1,5 +1,5 @@
-const WIDTH = 300;
-const HEIGHT = 300;
+const WIDTH = 700;
+const HEIGHT = 700;
 const FPS = 60;
 const NUMBER_OF_COLONIES = 4;
 const ANTS_PER_COLONY = 100;
@@ -72,7 +72,9 @@ function setup() {
     0.01
   );
 
-  simulation = new Simulation(simulationConfig, drawingConfig, probabilityConfig);
+  const uiComponents = new UiComponents(select('#stats_div'));
+
+  simulation = new Simulation(simulationConfig, drawingConfig, probabilityConfig, uiComponents);
 }
 
 function draw() {
