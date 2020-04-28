@@ -72,7 +72,7 @@ function setup() {
     0.01
   );
 
-  const uiComponents = new UiComponents(select('#stats_div'));
+  const uiComponents = new UiComponents(select('#stats_div'), select('#debug_div'));
 
   simulation = new Simulation(simulationConfig, drawingConfig, probabilityConfig, uiComponents);
 }

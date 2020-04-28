@@ -23,6 +23,7 @@ class Simulation {
   _initCells() {
     console.log('Initializing cells');
     this.cells = [];
+    this.pheromoneCells = new Set();
     for (let x = 0; x < this.simulationConfig.mapWidth; x++) {
       let row = [];
       for (let y = 0; y < this.simulationConfig.mapHeight; y++) {
@@ -156,13 +157,7 @@ class Simulation {
         this.antLeavesPheromone(ant, currentCell)
       });
     });
-
-    // Todo: improvement - memorize cells with pheromone and iterate only those
-    this.cells.forEach(row => {
-      row.forEach(cell => {
-        cell.decayPheromones(this.simulationConfig.foodPheromoneDecay, this.simulationConfig.homePheromoneDecay)
-      })
-    })
+    this.decayPheromone();
   }
 
   moveAntTowardsHome(ant) {
@@ -198,13 +193,27 @@ class Simulation {
   }
 
   antLeavesPheromone(ant, currentCell) {
-    if (!ant.isDead && (ant.x !== currentCell.x || ant.y !== currentCell.y)) {
+    if (currentCell !== null && !ant.isDead && (ant.x !== currentCell.x || ant.y !== currentCell.y)) {
       if (ant.carryingFood) {
         currentCell.addFoodPheromone(1, ant.colony);
       } else {
         currentCell.addHomePheromone(1, ant.colony);
       }
+      this.pheromoneCells.add(currentCell);
     }
+  }
+
+  decayPheromone() {
+    let cellsToDelete = [];
+    for (let cell in this.pheromoneCells) {
+      cell.decayPheromones(this.simulationConfig.foodPheromoneDecay, this.simulationConfig.homePheromoneDecay);
+      if (!cell.hasAnyPheromones()) {
+        cellsToDelete.push(cell);
+      }
+    }
+    cellsToDelete.forEach(cell => {
+      this.pheromoneCells.delete(cell);
+    });
   }
 
   draw() {
@@ -237,6 +246,7 @@ class Simulation {
     });
 
     this.uiComponents.statsDiv.html(this.statsHtmlString());
+    this.uiComponents.debugDiv.html(this.debugHtmlString());
   }
 
   statsHtmlString() {
@@ -244,6 +254,11 @@ class Simulation {
     this.colonies.forEach((colonyStats, index) => {
       prettyString += `<span style="color:${this.colonyColors[index]}">Colony id: ${colonyStats.index}   Food: ${colonyStats.food} <br></span>`
     });
+    return prettyString;
+  }
+
+  debugHtmlString() {
+    let prettyString = `Cells with pheromone in set: ${this.pheromoneCells.size}`;
     return prettyString;
   }
 }

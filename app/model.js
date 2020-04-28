@@ -214,6 +214,20 @@ class Pheromones {
     this.food = {};
     this.home = {};
   }
+
+  hasAnyPheromones() {
+    for (let foodKey in this.food) {
+      if (this.food[foodKey] > 0.01) {
+        return true;
+      }
+    }
+    for (let homeKey in this.home) {
+      if (this.home[homeKey] > 0.01) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
 
 const CellType = {
@@ -246,12 +260,12 @@ class Cell {
   }
 
   decayPheromones(foodDecay, homeDecay) {
-    Object.keys(this.pheromones.food).forEach(key => {
+    for (let key in this.pheromones.food) {
       this.pheromones.food[key] *= foodDecay;
-    });
-    Object.keys(this.pheromones.home).forEach(key => {
+    }
+    for (let key in this.pheromones.home) {
       this.pheromones.home[key] *= homeDecay;
-    });
+    }
   }
 
   getFoodPheromone(colony) {
@@ -268,6 +282,10 @@ class Cell {
       return 0;
     }
     return pheromone;
+  }
+
+  hasAnyPheromones() {
+    return this.pheromones.hasAnyPheromones();
   }
 }
 
@@ -289,7 +307,8 @@ class ColonyStats {
 }
 
 class UiComponents {
-  constructor(statsDiv) {
+  constructor(statsDiv, debugDiv) {
     this.statsDiv = statsDiv;
+    this.debugDiv = debugDiv;
   }
 }
