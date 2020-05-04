@@ -181,35 +181,40 @@ class Simulation {
     }
   }
 
+  /**
+   * Stores the food for the colony.
+   * @param colony
+   * @param quantity
+   */
+  storeFood(colony, quantity = 1) {
+    this.colonies[colony].storeFood(quantity);
+  }
+
+  /**
+   * Executes one tick of the simulation.
+   */
   run() {
     this.tick++;
     this.ants.forEach((colony, index) => {
-      let totalHealth = 0;
+      let totalColonyHealth = 0;
       colony.forEach(ant => {
-        totalHealth += ant.health;
-        const currentCell = this.getCell(ant.x, ant.y);
-        if (ant.isDead) {
-          // Todo: implement
-        } else if (ant.carryingFood) {
-          this.moveAntTowardsHome(ant);
-        } else {
-          this.moveAntTowardsFood(ant);
-        }
+        totalColonyHealth += ant.health;
+        ant.move();
         ant.eatFood();
-        this.antLeavesPheromone(ant, currentCell)
+        this.antLeavesPheromone(ant, this.getCell(ant.x, ant.y))
       });
-      this.colonies[index].averageHealth = int(totalHealth / colony.length);
+      this.colonies[index].averageHealth = int(totalColonyHealth / colony.length);
     });
-    this.calculateColonyStats();
     this.decayPheromone();
     this.consumeFood();
-    this.updateCharts();
+    this._updateCharts();
   }
 
-  calculateColonyStats() {
-  }
-
-  updateCharts() {
+  /**
+   * Adds the data from this tick of the simulation to the charts.
+   * @private
+   */
+  _updateCharts() {
     let foodCurrentStats = [];
     let healthCurrentStats = [];
 
@@ -220,38 +225,6 @@ class Simulation {
 
     this.charts.foodChart.pushData(foodCurrentStats, this.tick);
     this.charts.healthChart.pushData(healthCurrentStats, this.tick);
-  }
-
-  moveAntTowardsHome(ant) {
-    const forwardDirectionsStraight = ant.forwardDirections()[1];
-    const forwardCell = this.getCell(ant.x + forwardDirectionsStraight.x, ant.y + forwardDirectionsStraight.y);
-
-    if (forwardCell === null) {
-      ant.randomizeDirection();
-    } else if (forwardCell.type === CellType.HOME) {
-      ant.carryingFood = false;
-      this.colonies[ant.colony].storeFood();
-      ant.turnAround();
-      ant.searchForFood();
-    } else {
-      ant.searchForHome();
-    }
-  }
-
-  moveAntTowardsFood(ant) {
-    const forwardDirectionsStraight = ant.forwardDirections()[1];
-    const forwardCell = this.getCell(ant.x + forwardDirectionsStraight.x, ant.y + forwardDirectionsStraight.y);
-
-    if (forwardCell === null) {
-      ant.randomizeDirection();
-    } else if (forwardCell.type === CellType.FOOD) {
-      ant.carryingFood = true;
-      ant.turnAround();
-      this.clearFood(forwardCell);
-      ant.searchForHome();
-    } else {
-      ant.searchForFood();
-    }
   }
 
   antLeavesPheromone(ant, currentCell) {

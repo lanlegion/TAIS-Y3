@@ -62,7 +62,7 @@ class ProbabilityConfig {
 }
 
 class Ant {
-  constructor(x, y, colony, simulation, colonyStats, health = 100, hungerSpeed = 1) {
+  constructor(x, y, colony, simulation, colonyStats, health = 100, hungerSpeed = 1, carryingCapacity = 1) {
     this.simulation = simulation;
     this.x = x;
     this.y = y;
@@ -85,7 +85,35 @@ class Ant {
       {x: -1, y: 0},
       {x: -1, y: -1}
     ];
+    this.carryingCapacity = carryingCapacity;
+  }
 
+  /**
+   * Executes one tick move for the ant.
+   */
+  move() {
+    if (this.isDead) {
+      return;
+    }
+
+    const forwardDirection = this.forwardDirections()[1];
+    const forwardCell = simulation.getCell(this.x + forwardDirection.x, this.y + forwardDirection.y);
+    if (forwardCell === null) {
+      this.randomizeDirection();
+      return;
+    }
+
+    if (this.carryingFood && forwardCell.type === CellType.HOME) {
+      this.carryingFood = false;
+      this.simulation.storeFood(this.colony, this.carryingCapacity);
+      this.turnAround();
+    } else if (!this.carryingFood && forwardCell.type === CellType.FOOD) {
+      this.carryingFood = true;
+      this.simulation.clearFood(forwardCell);
+      this.turnAround();
+    }
+
+    this.seek(!this.carryingFood);
   }
 
   /**
