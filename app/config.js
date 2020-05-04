@@ -1,8 +1,8 @@
 const ANT_SIM_CONFIG = {
   map: {
     drawPheromones: false,
-    width: 400,
-    height: 400,
+    width: 600,
+    height: 600,
     colors: {
       colony: [
         '#f0f64d',
@@ -28,19 +28,19 @@ const ANT_SIM_CONFIG = {
   fps: 60,
   gameSpeed: 1,
   ants: {
-    numberOfColonies: 2,
-    antsPerColony: 200,
+    numberOfColonies: 5,
+    antsPerColony: 150,
     sightRange: 5,
     maxHealth: 100
   },
   food: {
-    numberOfFoodStacks: 30,
+    numberOfFoodStacks: 100,
     foodStackSize: 20,
     foodItemValue: 1,
     antHunger: 0.007,
     lunchInterval: 100,
     birthsThreshold: 400,
-    starveSpeed: 0.1,
+    starveSpeed: 0.033,
     healingSpeed: 0.2
   },
   pheromones: {

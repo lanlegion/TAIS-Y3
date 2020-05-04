@@ -223,7 +223,7 @@ class Ant {
 
     // Todo: see
     const currentHunger = Math.random() * 2 * this.hungerSpeed;
-    const currentStarving = Math.random() * 10 * this.starveSpeed;
+    const currentStarving = Math.random() * 2 * this.starveSpeed;
 
     if (this.colonyStats.food > currentHunger) {
       this.health = min(this.maxHealth, this.health + this.healingSpeed);

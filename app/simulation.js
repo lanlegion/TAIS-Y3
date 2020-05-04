@@ -276,6 +276,10 @@ class Simulation {
   }
 
   draw() {
+    if (this.tick % 10 !== 0) {
+      return;
+    }
+
     background(this.config.map.colors.backgroundColor);
     noStroke();
 
