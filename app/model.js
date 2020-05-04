@@ -432,7 +432,7 @@ class ColonyStats {
    * @param numberOfAnts {number} the initial number of ants
    * @param hungerSpeed {number} the speed which defines how fast food is eaten.
    */
-  constructor(index, numberOfAnts, hungerSpeed = 10) {
+  constructor(index, numberOfAnts, hungerSpeed = 0.01) {
     this.index = index;
     this.numberOfAnts = numberOfAnts;
     this.numberOfDeadAnts = 0;
@@ -452,7 +452,7 @@ class ColonyStats {
    * Food is eaten by the colony based on the hunger speed.
    */
   eatFood() {
-    this.food = max(0, this.food - int(this.numberOfAnts / this.hungerSpeed));
+    this.food = max(0, this.food - int(this.numberOfAnts * this.hungerSpeed));
   }
 
   /**

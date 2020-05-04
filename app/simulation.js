@@ -264,11 +264,9 @@ class Simulation {
    * Consume food over time.
    */
   consumeFood() {
-    if (this.tick % 100 === 0) {
-      this.colonies.forEach(colony => {
-        colony.eatFood();
-      });
-    }
+    this.colonies.forEach(colony => {
+      colony.eatFood();
+    });
   }
 
   draw() {
