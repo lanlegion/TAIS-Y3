@@ -1,5 +1,5 @@
 class Simulation {
-  constructor(simulationConfig, drawingConfig, probabilityConfig, uiComponents) {
+  constructor(simulationConfig, drawingConfig, probabilityConfig, uiComponents, historyChart) {
     console.log(`Simulation configuration: ${JSON.stringify(simulationConfig, undefined, 2)}`);
     console.log(`Drawing configuration: ${JSON.stringify(drawingConfig, undefined, 2)}`);
     console.log(`Probability configuration: ${JSON.stringify(probabilityConfig, undefined, 2)}`);
@@ -8,6 +8,7 @@ class Simulation {
     this.drawingConfig = drawingConfig;
     this.probabilityConfig = probabilityConfig;
     this.uiComponents = uiComponents;
+    this.historyChart = historyChart;
 
     this.tick = 0;
 
@@ -51,11 +52,12 @@ class Simulation {
     this.ants = [];
     this.colonies = [];
     for (let colony = 0; colony < this.simulationConfig.numberOfColonies; colony++) {
-      this.colonies.push(new ColonyStats(colony, this.simulationConfig.antsPerColony));
+      const colonyStats = new ColonyStats(colony, this.simulationConfig.antsPerColony)
+      this.colonies.push(colonyStats);
       this.ants.push([]);
       for (let ant = 0; ant < this.simulationConfig.antsPerColony; ant++) {
         const initialPosition = this._getInitialPositionForAnt(colony);
-        this.ants[colony].push(new Ant(initialPosition.x, initialPosition.y, colony, this));
+        this.ants[colony].push(new Ant(initialPosition.x, initialPosition.y, colony, this, colonyStats));
       }
     }
   }
@@ -64,7 +66,7 @@ class Simulation {
     console.log('Initializing colonies colors');
     this.colonyColors = [];
     for (let colony = 0; colony < this.simulationConfig.numberOfColonies; colony++) {
-      this.colonyColors.push(this._getRandomColorString());
+      this.colonyColors.push(this.drawingConfig.colonyColors[colony]);
     }
   }
 
@@ -144,8 +146,11 @@ class Simulation {
 
   run() {
     this.tick++;
-    this.ants.forEach(colony => {
+    let foodCurrentStats = [];
+    this.ants.forEach((colony, index) => {
+      let totalHealth = 0;
       colony.forEach(ant => {
+        totalHealth += ant.health;
         const currentCell = this.getCell(ant.x, ant.y);
         if (ant.isDead) {
           // Todo: implement
@@ -154,10 +159,23 @@ class Simulation {
         } else {
           this.moveAntTowardsFood(ant);
         }
+        ant.eatFood();
         this.antLeavesPheromone(ant, currentCell)
       });
+      this.colonies[index].averageHealth = int(totalHealth / colony.length);
+      foodCurrentStats.push(this.colonies[index].food);
     });
+    this.calculateColonyStats();
     this.decayPheromone();
+    this.consumeFood();
+    this.updateHistory(foodCurrentStats);
+  }
+
+  calculateColonyStats() {
+  }
+
+  updateHistory(foodCurrentStats) {
+    this.historyChart.pushData(foodCurrentStats, this.tick);
   }
 
   moveAntTowardsHome(ant) {
@@ -168,7 +186,7 @@ class Simulation {
       ant.randomizeDirection();
     } else if (forwardCell.type === CellType.HOME) {
       ant.carryingFood = false;
-      this.colonies[ant.colony].food += 1;
+      this.colonies[ant.colony].storeFood();
       ant.turnAround();
       ant.searchForFood();
     } else {
@@ -216,6 +234,14 @@ class Simulation {
     });
   }
 
+  consumeFood() {
+    if(this.tick % 100 === 0) {
+      this.colonies.forEach(colony => {
+        colony.eatFood();
+      });
+    }
+  }
+
   draw() {
     background(this.drawingConfig.backgroundColor);
     noStroke();
@@ -252,13 +278,18 @@ class Simulation {
   statsHtmlString() {
     let prettyString = '';
     this.colonies.forEach((colonyStats, index) => {
-      prettyString += `<span style="color:${this.colonyColors[index]}">Colony id: ${colonyStats.index}   Food: ${colonyStats.food} <br></span>`
+      prettyString += `<span style="color:${this.colonyColors[index]}">Colony id: ${colonyStats.index}  `
+        + `Food: ${colonyStats.food}  `
+        + `Alive ants: ${colonyStats.numberOfAnts}  `
+        + `Dead ants: ${colonyStats.numberOfDeadAnts}  `
+        + `Avg health:  ${colonyStats.averageHealth}  `
+        +`<br></span>`
     });
     return prettyString;
   }
 
   debugHtmlString() {
-    let prettyString = `Cells with pheromone in set: ${this.pheromoneCells.size}`;
+    let prettyString = `Tick: ${this.tick}<br>Cells with pheromone in set: ${this.pheromoneCells.size}`;
     return prettyString;
   }
 }

@@ -3,19 +3,29 @@ const HEIGHT = 700;
 const FPS = 60;
 const NUMBER_OF_COLONIES = 4;
 const ANTS_PER_COLONY = 100;
-const FOOD_STACKS = 30;
+const FOOD_STACKS = 120;
 const FOOD_STACK_SIZE = 10;
 const GAME_SPEED = 1;
 const FOOD_PHEROMONE_DECAY = 0.99;
 const HOME_PHEROMONE_DECAY = 0.99;
 const ANT_RANGE = 5;
 
+const COLONY_COLORS = [
+  '#f0f64d',
+  '#6ae36a',
+  '#37f5c9',
+  '#ff2020',
+  '#c2367e',
+  '#9933d4',
+  '#000000'
+];
+
 const COLORS = {
   HOME_COLOR: '#31536b',
   FOOD_COLOR: '#75b8c8',
   BACKGROUND_COLOR: '#e6f5f2',
   ANT_COLOR: '#272725',
-  DEAD_ANT_COLOR: '#dd0214',
+  DEAD_ANT_COLOR: '#707070',
   ANT_WITH_FOOD: '#14f43c'
 };
 
@@ -68,7 +78,8 @@ function setup() {
     COLORS.ANT_WITH_FOOD,
     SIZES.HOME,
     SIZES.ANT,
-    SIZES.FOOD
+    SIZES.FOOD,
+    COLONY_COLORS
   );
 
   const probabilityConfig = new ProbabilityConfig(
@@ -79,7 +90,9 @@ function setup() {
 
   const uiComponents = new UiComponents(select('#stats_div'), select('#debug_div'));
 
-  simulation = new Simulation(simulationConfig, drawingConfig, probabilityConfig, uiComponents);
+  const historyChart = new HistoryChart(NUMBER_OF_COLONIES, COLONY_COLORS);
+
+  simulation = new Simulation(simulationConfig, drawingConfig, probabilityConfig, uiComponents, historyChart);
 }
 
 function draw() {

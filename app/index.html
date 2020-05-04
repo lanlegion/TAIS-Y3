@@ -13,10 +13,12 @@
     </style>
     <script src="../p5.js"></script>
     <script src="../addons/p5.sound.min.js"></script>
+    <script src="../addons/Chart.js"></script>
 
     <script src="model.js"></script>
     <script src="simulation.js"></script>
     <script src="sketch.js"></script>
+    <script src="chart-utils.js"></script>
 </head>
 
 <body style="margin: 20pt">
@@ -28,8 +30,12 @@
     <h3>Simulation stats</h3>
     <div id="stats_div"></div>
 </div>
+
+<div style="width:35%;">
+    <canvas id="line-chart" width="400" height="400"></canvas>
+</div>
+
 <br>
 
 </body>
-
 </html>

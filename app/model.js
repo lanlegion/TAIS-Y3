@@ -36,7 +36,8 @@ class DrawingConfig {
     antWithFoodColor,
     homeSize,
     antSize,
-    foodSize
+    foodSize,
+    colonyColors
   ) {
     this.homeColor = homeColor;
     this.foodColor = foodColor;
@@ -47,6 +48,7 @@ class DrawingConfig {
     this.homeSize = homeSize;
     this.antSize = antSize;
     this.foodSize = foodSize;
+    this.colonyColors = colonyColors;
   }
 }
 
@@ -64,14 +66,19 @@ class ProbabilityConfig {
 }
 
 class Ant {
-  constructor(x, y, colony, simulation) {
+  constructor(x, y, colony, simulation, colonyStats, health = 100, hungerSpeed = 1) {
     this.x = x;
     this.y = y;
     this.colony = colony;
+    this.colonyStats = colonyStats;
     this.angle = 0;
     this.carryingFood = false;
     this.isDead = false;
     this.simulation = simulation;
+    this.health = health;
+    this.maxHealth = health;
+    this.averageHealth = 100;
+    this.hungerSpeed = hungerSpeed;
 
     this.angle = 0;
     this.directions = [
@@ -207,6 +214,22 @@ class Ant {
       }
     }
   }
+
+  eatFood() {
+    if (this.isDead) {
+      return;
+    }
+
+    if (this.colonyStats.food > 0) {
+      this.health = min(this.maxHealth, this.health + this.hungerSpeed);
+    } else {
+      this.health = max(0, this.health - this.hungerSpeed);
+      if (this.health === 0) {
+        this.isDead = true;
+        this.colonyStats.antDied();
+      }
+    }
+  }
 }
 
 class Pheromones {
@@ -290,15 +313,27 @@ class Cell {
 }
 
 class ColonyStats {
-  constructor(index, numberOfAnts) {
+  constructor(index, numberOfAnts, hungerSpeed = 10) {
     this.index = index;
-    this.nuberOfAnts = numberOfAnts;
+    this.numberOfAnts = numberOfAnts;
+    this.numberOfDeadAnts = 0;
     this.food = 0;
     this.age = 0;
+    this.history = [];
+    this.hungerSpeed = hungerSpeed;
   }
 
   storeFood() {
     this.food++;
+  }
+
+  eatFood() {
+    this.food = max(0, this.food - int(this.numberOfAnts / this.hungerSpeed));
+  }
+
+  antDied() {
+    this.numberOfAnts -= 1;
+    this.numberOfDeadAnts += 1;
   }
 
   aging() {
