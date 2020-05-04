@@ -28,10 +28,8 @@ class SimulationConfig {
 
 class DrawingConfig {
   constructor(
-    homeColor,
     foodColor,
     backgroundColor,
-    antColor,
     deadAntColor,
     antWithFoodColor,
     homeSize,
@@ -39,10 +37,8 @@ class DrawingConfig {
     foodSize,
     colonyColors
   ) {
-    this.homeColor = homeColor;
     this.foodColor = foodColor;
     this.backgroundColor = backgroundColor;
-    this.antColor = antColor;
     this.deadAntColor = deadAntColor;
     this.antWithFoodColor = antWithFoodColor;
     this.homeSize = homeSize;
@@ -67,37 +63,43 @@ class ProbabilityConfig {
 
 class Ant {
   constructor(x, y, colony, simulation, colonyStats, health = 100, hungerSpeed = 1) {
+    this.simulation = simulation;
     this.x = x;
     this.y = y;
+    this.angle = 0;
     this.colony = colony;
     this.colonyStats = colonyStats;
-    this.angle = 0;
     this.carryingFood = false;
     this.isDead = false;
-    this.simulation = simulation;
     this.health = health;
     this.maxHealth = health;
-    this.averageHealth = 100;
     this.hungerSpeed = hungerSpeed;
-
     this.angle = 0;
     this.directions = [
-      {x: 0, y: -1}, //N
-      {x: 1, y: -1}, //NE
-      {x: 1, y: 0},  //E
-      {x: 1, y: 1},  //SE
-      {x: 0, y: 1},  //S
-      {x: -1, y: 1}, //SW
-      {x: -1, y: 0}, //W
-      {x: -1, y: -1} //NW
+      {x: 0, y: -1},
+      {x: 1, y: -1},
+      {x: 1, y: 0},
+      {x: 1, y: 1},
+      {x: 0, y: 1},
+      {x: -1, y: 1},
+      {x: -1, y: 0},
+      {x: -1, y: -1}
     ];
 
   }
 
+  /**
+   * Returns the direction given by the current angle.
+   * @return {{x: number, y: number}}
+   */
   forward() {
     return this.directions[this.angle];
   }
 
+  /**
+   * Returns the forward 3 direction based on the current angle (left-forward, forward, right-forward).
+   * @return [fwdLeft: {x: number, y: number}, fwd: {x: number, y: number}, fwdRight: {x: number, y: number}]
+   */
   forwardDirections() {
     const fwd = this.directions[this.angle];
     const i = this.angle;
@@ -107,6 +109,9 @@ class Ant {
     return [fwdLeft, fwd, fwdRight];
   }
 
+  /**
+   * Changes the current angle with one position to left.
+   */
   turnLeft() {
     this.angle -= 1;
     if (this.angle < 0) {
@@ -114,21 +119,36 @@ class Ant {
     }
   }
 
+  /**
+   * Executes a 45 degree right turn.
+   */
   turnRight() {
     this.angle += 1;
     this.angle = this.angle % this.directions.length;
   }
 
+  /**
+   * Executes a 180 degree turn.
+   */
   turnAround() {
     for (let i = 0; i < 4; i++) {
       this.turnRight();
     }
   }
 
+  /**
+   *  Selects a random direction.
+   */
   randomizeDirection() {
     this.angle = floor(random(0, this.directions.length));
   }
 
+  /**
+   * Two possible moves:
+   * - moved ahead
+   * - changes direction to left or right
+   * See simulation.probabilityConfig for probability details
+   */
   moveRandomly() {
     let fwd = this.forward();
     let probability = Math.random();
@@ -142,14 +162,26 @@ class Ant {
     }
   }
 
+  /**
+   * Ant moves with the purpose of finding food.
+   */
   searchForFood() {
     this.seek(true);
   }
 
+  /**
+   * Ant moves with the purpose of finding home.
+   */
   searchForHome() {
     this.seek(false);
   }
 
+  /**
+   * Determines which is the best direction for the Ant. If best direction
+   * is ahead it moves, if not it changes its direction until the best
+   * direction is ahead.
+   * @param lookingForFood - if true then best direction is given by food positions, else by home position
+   */
   seek(lookingForFood) {
     const forwardDirections = this.forwardDirections();
     let maxScore = 0;
@@ -176,6 +208,13 @@ class Ant {
     }
   }
 
+  /**
+   * Calculates a score for a given direction and based on the ant's purpose.
+   * The higher the score the better the direction.
+   * @param direction {{x: number, y: number}}
+   * @param lookingForFood {boolean}
+   * @return {number}
+   */
   getScoreForDirection(direction, lookingForFood) {
     const range = simulation.simulationConfig.antRange;
     const x0 = this.x + direction.x * range;
@@ -195,6 +234,12 @@ class Ant {
     return score;
   }
 
+  /**
+   * Calculates the score for a cell based on the ant's purpose.
+   * @param cell {Cell}
+   * @param lookingForFood {boolean}
+   * @return {number}
+   */
   getScoreForCell(cell, lookingForFood) {
     if (cell == null) {
       return 0;
@@ -215,6 +260,10 @@ class Ant {
     }
   }
 
+  /**
+   * Checks if the colony has food in order to eat or to starve to death.
+   * If the and is dead, nothing happens.
+   */
   eatFood() {
     if (this.isDead) {
       return;
@@ -238,6 +287,10 @@ class Pheromones {
     this.home = {};
   }
 
+  /**
+   * Checks if there is any pheromone left.
+   * @return {boolean} true if there is any pheromone, false otherwise.
+   */
   hasAnyPheromones() {
     for (let foodKey in this.food) {
       if (this.food[foodKey] > 0.01) {
@@ -268,20 +321,35 @@ class Cell {
     this.pheromones = new Pheromones();
   }
 
+  /**
+   * Adds food pheromone to the cell.
+   * @param value {number} the amount of food pheromone.
+   * @param colony {number} the colony index of the pheromone.
+   */
   addFoodPheromone(value, colony) {
-    if (!this.pheromones.food.hasOwnProperty(colony)) {
+    if (!this.pheromones.food[colony]) {
       this.pheromones.food[colony] = 0.0;
     }
     this.pheromones.food[colony] += value;
   }
 
+  /**
+   * Adds home pheromone to the cell.
+   * @param value {number} the amount of home pheromone.
+   * @param colony {number} the colony index of the pheromone.
+   */
   addHomePheromone(value, colony) {
-    if (!this.pheromones.home.hasOwnProperty(colony)) {
+    if (!this.pheromones.home[colony]) {
       this.pheromones.home[colony] = 0.0;
     }
     this.pheromones.home[colony] += value;
   }
 
+  /**
+   * Decays (decreases) the pheromone levels.
+   * @param foodDecay {number} the decay for food pheromones.
+   * @param homeDecay {number} the decay for home pheromones.
+   */
   decayPheromones(foodDecay, homeDecay) {
     for (let key in this.pheromones.food) {
       this.pheromones.food[key] *= foodDecay;
@@ -291,6 +359,11 @@ class Cell {
     }
   }
 
+  /**
+   * Retrieves the food pheromones for a given colony.
+   * @param colony {number} the index of the colony.
+   * @return {number} the food pheromones amount.
+   */
   getFoodPheromone(colony) {
     const pheromone = this.pheromones.food[colony];
     if (pheromone === undefined) {
@@ -299,6 +372,11 @@ class Cell {
     return pheromone;
   }
 
+  /**
+   * Retrieves the home pheromones for a given colony.
+   * @param colony {number} the index of the colony.
+   * @return {number} the food pheromones amount.
+   */
   getHomePheromone(colony) {
     const pheromone = this.pheromones.home[colony];
     if (pheromone === undefined) {
@@ -307,40 +385,60 @@ class Cell {
     return pheromone;
   }
 
+  /**
+   * Checks if there are any pheromones in the cell.
+   * @return {boolean} true if any pheromone exist, false otherwise.
+   */
   hasAnyPheromones() {
     return this.pheromones.hasAnyPheromones();
   }
 }
 
+/**
+ * Class which contains more stats regarding the evolution of ants.
+ */
 class ColonyStats {
+
+  /**
+   * @param index {number} the colony index
+   * @param numberOfAnts {number} the initial number of ants
+   * @param hungerSpeed {number} the speed which defines how fast food is eaten.
+   */
   constructor(index, numberOfAnts, hungerSpeed = 10) {
     this.index = index;
     this.numberOfAnts = numberOfAnts;
     this.numberOfDeadAnts = 0;
     this.food = 0;
-    this.age = 0;
-    this.history = [];
     this.hungerSpeed = hungerSpeed;
   }
 
-  storeFood() {
-    this.food++;
+  /**
+   * Stores food.
+   * @param quantity {number} the amount of food to be stored.
+   */
+  storeFood(quantity = 1) {
+    this.food += quantity;
   }
 
+  /**
+   * Food is eaten by the colony based on the hunger speed.
+   */
   eatFood() {
     this.food = max(0, this.food - int(this.numberOfAnts / this.hungerSpeed));
   }
 
+  /**
+   * Signals the death of an ant.
+   */
   antDied() {
     this.numberOfAnts -= 1;
     this.numberOfDeadAnts += 1;
   }
-
-  aging() {
-    this.age++;
-  }
 }
 
+/**
+ * Class containing the charts to be displayed.
+ */
 class UiComponents {
   constructor(statsDiv, debugDiv) {
     this.statsDiv = statsDiv;

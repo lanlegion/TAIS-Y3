@@ -47,6 +47,7 @@ const SIZES = {
 let simulation;
 let isRunning = true;
 
+// Switches on and off the simulation
 function switchRunning() {
   isRunning = !isRunning;
 }
@@ -70,10 +71,8 @@ function setup() {
   );
 
   const drawingConfig = new DrawingConfig(
-    COLORS.HOME_COLOR,
     COLORS.FOOD_COLOR,
     COLORS.BACKGROUND_COLOR,
-    COLORS.ANT_COLOR,
     COLORS.DEAD_ANT_COLOR,
     COLORS.ANT_WITH_FOOD,
     SIZES.HOME,
