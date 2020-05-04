@@ -35,6 +35,11 @@ const SIZES = {
 };
 
 let simulation;
+let isRunning = true;
+
+function switchRunning() {
+  isRunning = !isRunning;
+}
 
 function setup() {
   createCanvas(WIDTH, HEIGHT);
@@ -78,6 +83,8 @@ function setup() {
 }
 
 function draw() {
-  simulation.run();
-  simulation.draw();
+  if(isRunning) {
+    simulation.run();
+    simulation.draw();
+  }
 }
