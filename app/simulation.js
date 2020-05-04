@@ -234,7 +234,7 @@ class Simulation {
    * @param quantity {number} the quantity of pheromone which is left by the ant.
    */
   antLeavesPheromone(ant, currentCell, quantity = 1) {
-    if (currentCell !== null && !ant.isDead && (ant.x !== currentCell.x || ant.y !== currentCell.y)) {
+    if (currentCell !== null && !ant.isDead) {
       if (ant.carryingFood) {
         currentCell.addFoodPheromone(quantity, ant.colony);
       } else {
