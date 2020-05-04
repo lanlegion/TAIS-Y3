@@ -1,5 +1,5 @@
 class Ant {
-  constructor(x, y, colony, simulation, colonyStats, health = 100, hungerSpeed = 1, carryingCapacity = 1) {
+  constructor(x, y, colony, simulation, colonyStats, health = 100, hungerSpeed = 1, starveSpeed = 0.5, healingSpeed) {
     this.simulation = simulation;
     this.x = x;
     this.y = y;
@@ -22,7 +22,8 @@ class Ant {
       {x: -1, y: 0},
       {x: -1, y: -1}
     ];
-    this.carryingCapacity = carryingCapacity;
+    this.starveSpeed = starveSpeed;
+    this.healingSpeed = healingSpeed;
   }
 
   /**
@@ -220,10 +221,12 @@ class Ant {
       return;
     }
 
-    if (this.colonyStats.food > 0) {
-      this.health = min(this.maxHealth, this.health + this.hungerSpeed);
+    if (this.colonyStats.food > this.hungerSpeed) {
+      this.health = min(this.maxHealth, this.health + this.healingSpeed);
+      this.colonyStats.food -= this.hungerSpeed;
+      console.log('decrease');
     } else {
-      this.health = max(0, this.health - this.hungerSpeed);
+      this.health = max(0, this.health - this.starveSpeed);
       if (this.health === 0) {
         this.isDead = true;
         this.colonyStats.antDied();
@@ -353,14 +356,12 @@ class ColonyStats {
   /**
    * @param index {number} the colony index
    * @param numberOfAnts {number} the initial number of ants
-   * @param hungerSpeed {number} the speed which defines how fast food is eaten.
    */
-  constructor(index, numberOfAnts, hungerSpeed = 0.01) {
+  constructor(index, numberOfAnts) {
     this.index = index;
     this.numberOfAnts = numberOfAnts;
     this.numberOfDeadAnts = 0;
     this.food = 0;
-    this.hungerSpeed = hungerSpeed;
   }
 
   /**
@@ -375,7 +376,7 @@ class ColonyStats {
    * Food is eaten by the colony based on the hunger speed.
    */
   eatFood() {
-    this.food = max(0, this.food - int(this.numberOfAnts * this.hungerSpeed));
+    //this.food = max(0, this.food - int(this.numberOfAnts * this.hungerSpeed));
   }
 
   /**

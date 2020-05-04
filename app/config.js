@@ -28,7 +28,7 @@ const ANT_SIM_CONFIG = {
   fps: 60,
   gameSpeed: 1,
   ants: {
-    numberOfColonies: 5,
+    numberOfColonies: 2,
     antsPerColony: 200,
     sightRange: 5,
     maxHealth: 100
@@ -37,9 +37,11 @@ const ANT_SIM_CONFIG = {
     numberOfFoodStacks: 30,
     foodStackSize: 20,
     foodItemValue: 1,
-    antHunger: 1,
+    antHunger: 0.007,
     lunchInterval: 100,
-    birthsThreshold: 400
+    birthsThreshold: 400,
+    starveSpeed: 0.1,
+    healingSpeed: 0.2
   },
   pheromones: {
     foodDecay: 0.99,

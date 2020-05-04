@@ -61,7 +61,9 @@ class Simulation {
             this,
             colonyStats,
             this.config.ants.maxHealth,
-            this.config.food.antHunger));
+            this.config.food.antHunger,
+            this.config.food.starveSpeed,
+            this.config.food.healingSpeed));
       }
     }
   }
@@ -207,7 +209,7 @@ class Simulation {
         ant.eatFood();
         this.antLeavesPheromone(ant, this.getCell(ant.x, ant.y))
       });
-      this.colonies[index].averageHealth = int(totalColonyHealth / colony.length);
+      this.colonies[index].averageHealth = totalColonyHealth / colony.length;
     });
     this.decayPheromone();
     this.consumeFood();
