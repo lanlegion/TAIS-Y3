@@ -221,12 +221,16 @@ class Ant {
       return;
     }
 
-    if (this.colonyStats.food > this.hungerSpeed) {
+    // Todo: see
+    const currentHunger = Math.random() * 2 * this.hungerSpeed;
+    const currentStarving = Math.random() * 10 * this.starveSpeed;
+
+    if (this.colonyStats.food > currentHunger) {
       this.health = min(this.maxHealth, this.health + this.healingSpeed);
-      this.colonyStats.food -= this.hungerSpeed;
+      this.colonyStats.food -= currentHunger;
       console.log('decrease');
     } else {
-      this.health = max(0, this.health - this.starveSpeed);
+      this.health = max(0, this.health - currentStarving);
       if (this.health === 0) {
         this.isDead = true;
         this.colonyStats.antDied();
