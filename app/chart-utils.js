@@ -1,6 +1,5 @@
-class HistoryChart {
-
-  constructor(numOfColonies, colors = null) {
+class AntsChart {
+  constructor(numOfColonies, colors, chartId, title = 'N/A') {
     this.numOfColonies = numOfColonies;
     this.colors = colors;
     this.config = {
@@ -10,7 +9,7 @@ class HistoryChart {
         responsive: true,
         title: {
           display: true,
-          text: 'Colonies History'
+          text: title
         },
         tooltips: {
           mode: 'index',
@@ -52,13 +51,13 @@ class HistoryChart {
       this.config.data.datasets.push(dataset);
     }
 
-    this.ctx = document.getElementById('line-chart').getContext('2d');
+    this.ctx = document.getElementById(chartId).getContext('2d');
     this.myLine = new Chart(this.ctx, this.config);
   }
 
-  pushData(tickData, tick) {
+  pushData(data, tick) {
     for (let colony = 0; colony < this.numOfColonies; colony++) {
-      this.config.data.datasets[colony].data.push(tickData[colony]);
+      this.config.data.datasets[colony].data.push(data[colony]);
     }
     this.config.data.labels.push(tick);
     this.myLine.update();

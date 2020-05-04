@@ -1,5 +1,5 @@
 class Simulation {
-  constructor(simulationConfig, drawingConfig, probabilityConfig, uiComponents, historyChart) {
+  constructor(simulationConfig, drawingConfig, probabilityConfig, uiComponents, charts) {
     console.log(`Simulation configuration: ${JSON.stringify(simulationConfig, undefined, 2)}`);
     console.log(`Drawing configuration: ${JSON.stringify(drawingConfig, undefined, 2)}`);
     console.log(`Probability configuration: ${JSON.stringify(probabilityConfig, undefined, 2)}`);
@@ -8,7 +8,7 @@ class Simulation {
     this.drawingConfig = drawingConfig;
     this.probabilityConfig = probabilityConfig;
     this.uiComponents = uiComponents;
-    this.historyChart = historyChart;
+    this.charts = charts;
 
     this.tick = 0;
 
@@ -146,7 +146,6 @@ class Simulation {
 
   run() {
     this.tick++;
-    let foodCurrentStats = [];
     this.ants.forEach((colony, index) => {
       let totalHealth = 0;
       colony.forEach(ant => {
@@ -163,19 +162,27 @@ class Simulation {
         this.antLeavesPheromone(ant, currentCell)
       });
       this.colonies[index].averageHealth = int(totalHealth / colony.length);
-      foodCurrentStats.push(this.colonies[index].food);
     });
     this.calculateColonyStats();
     this.decayPheromone();
     this.consumeFood();
-    this.updateHistory(foodCurrentStats);
+    this.updateCharts();
   }
 
   calculateColonyStats() {
   }
 
-  updateHistory(foodCurrentStats) {
-    this.historyChart.pushData(foodCurrentStats, this.tick);
+  updateCharts() {
+    let foodCurrentStats = [];
+    let healthCurrentStats = [];
+
+    for(let colony = 0; colony < this.colonies.length; colony++) {
+      foodCurrentStats.push(this.colonies[colony].food);
+      healthCurrentStats.push(this.colonies[colony].averageHealth);
+    }
+
+    this.charts.foodChart.pushData(foodCurrentStats, this.tick);
+    this.charts.healthChart.pushData(healthCurrentStats, this.tick);
   }
 
   moveAntTowardsHome(ant) {
@@ -278,12 +285,17 @@ class Simulation {
   statsHtmlString() {
     let prettyString = '';
     this.colonies.forEach((colonyStats, index) => {
-      prettyString += `<span style="color:${this.colonyColors[index]}">Colony id: ${colonyStats.index}  `
+      let tempString = `<span style="color:${this.colonyColors[index]}">Colony id: ${colonyStats.index}  `
         + `Food: ${colonyStats.food}  `
         + `Alive ants: ${colonyStats.numberOfAnts}  `
         + `Dead ants: ${colonyStats.numberOfDeadAnts}  `
         + `Avg health:  ${colonyStats.averageHealth}  `
         +`<br></span>`
+
+      if(colonyStats.numberOfAnts === 0) {
+        tempString = '<strike>' + tempString + '</strike>';
+      }
+      prettyString += tempString;
     });
     return prettyString;
   }

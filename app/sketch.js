@@ -90,9 +90,15 @@ function setup() {
 
   const uiComponents = new UiComponents(select('#stats_div'), select('#debug_div'));
 
-  const historyChart = new HistoryChart(NUMBER_OF_COLONIES, COLONY_COLORS);
+  const foodChart = new AntsChart(NUMBER_OF_COLONIES, COLONY_COLORS, 'food_chart', 'Food');
+  const healthChart = new AntsChart(NUMBER_OF_COLONIES, COLONY_COLORS, 'health_chart', 'Health');
 
-  simulation = new Simulation(simulationConfig, drawingConfig, probabilityConfig, uiComponents, historyChart);
+  const charts = {
+    foodChart: foodChart,
+    healthChart: healthChart
+  }
+
+  simulation = new Simulation(simulationConfig, drawingConfig, probabilityConfig, uiComponents, charts);
 }
 
 function draw() {
