@@ -1,12 +1,8 @@
 class Simulation {
-  constructor(simulationConfig, drawingConfig, probabilityConfig, uiComponents, charts) {
-    console.log(`Simulation configuration: ${JSON.stringify(simulationConfig, undefined, 2)}`);
-    console.log(`Drawing configuration: ${JSON.stringify(drawingConfig, undefined, 2)}`);
-    console.log(`Probability configuration: ${JSON.stringify(probabilityConfig, undefined, 2)}`);
+  constructor(config, uiComponents, charts) {
+    console.log(`Simulation config: ${JSON.stringify(config, undefined, 2)}`);
 
-    this.simulationConfig = simulationConfig;
-    this.drawingConfig = drawingConfig;
-    this.probabilityConfig = probabilityConfig;
+    this.config = config;
     this.uiComponents = uiComponents;
     this.charts = charts;
 
@@ -25,9 +21,9 @@ class Simulation {
     console.log('Initializing cells');
     this.cells = [];
     this.pheromoneCells = new Set();
-    for (let x = 0; x < this.simulationConfig.mapWidth; x++) {
+    for (let x = 0; x < this.config.map.width; x++) {
       let row = [];
-      for (let y = 0; y < this.simulationConfig.mapHeight; y++) {
+      for (let y = 0; y < this.config.map.height; y++) {
         row.push(new Cell(x, y));
       }
       this.cells.push(row);
@@ -37,7 +33,7 @@ class Simulation {
   _initHomes() {
     console.log('Initializing homes');
     this.homes = [];
-    for (let colony = 0; colony < this.simulationConfig.numberOfColonies; colony++) {
+    for (let colony = 0; colony < this.config.ants.numberOfColonies; colony++) {
       let colonyHomes = [];
       this._gatRandomSquareLocations().forEach(cell => {
         cell.type = CellType.HOME;
@@ -51,13 +47,21 @@ class Simulation {
     console.log('Initializing ants');
     this.ants = [];
     this.colonies = [];
-    for (let colony = 0; colony < this.simulationConfig.numberOfColonies; colony++) {
-      const colonyStats = new ColonyStats(colony, this.simulationConfig.antsPerColony)
+    for (let colony = 0; colony < this.config.ants.numberOfColonies; colony++) {
+      const colonyStats = new ColonyStats(colony, this.config.ants.antsPerColony)
       this.colonies.push(colonyStats);
       this.ants.push([]);
-      for (let ant = 0; ant < this.simulationConfig.antsPerColony; ant++) {
+      for (let ant = 0; ant < this.config.ants.antsPerColony; ant++) {
         const initialPosition = this._getInitialPositionForAnt(colony);
-        this.ants[colony].push(new Ant(initialPosition.x, initialPosition.y, colony, this, colonyStats));
+        this.ants[colony].push(
+          new Ant(
+            initialPosition.x,
+            initialPosition.y,
+            colony,
+            this,
+            colonyStats,
+            this.config.ants.maxHealth,
+            this.config.food.antHunger));
       }
     }
   }
@@ -65,20 +69,20 @@ class Simulation {
   _initColoniesColors() {
     console.log('Initializing colonies colors');
     this.colonyColors = [];
-    for (let colony = 0; colony < this.simulationConfig.numberOfColonies; colony++) {
-      this.colonyColors.push(this.drawingConfig.colonyColors[colony]);
+    for (let colony = 0; colony < this.config.ants.numberOfColonies; colony++) {
+      this.colonyColors.push(this.config.map.colors.colony[colony]);
     }
   }
 
   _initFoodStacks() {
     console.log('Initializing food stacks');
     this.foods = [];
-    for (let food = 0; food < this.simulationConfig.numberOfFoodStacks; food++) {
+    for (let food = 0; food < this.config.food.numberOfFoodStacks; food++) {
       const randomLocation = this._getRandomLocationOnMap();
       for (let x = randomLocation.x;
-           x < randomLocation.x + this.simulationConfig.foodStackSize && x < this.simulationConfig.mapWidth; x++) {
+           x < randomLocation.x + this.config.food.foodStackSize && x < this.config.map.width; x++) {
         for (let y = randomLocation.y;
-             y < randomLocation.y + this.simulationConfig.foodStackSize && y < this.simulationConfig.mapHeight; y++) {
+             y < randomLocation.y + this.config.food.foodStackSize && y < this.config.map.height; y++) {
           const currentCell = this.cells[x][y];
           currentCell.type = CellType.FOOD;
           this.foods.push(currentCell);
@@ -104,8 +108,8 @@ class Simulation {
    */
   _getRandomLocationOnMap() {
     return {
-      x: 1 + int(Math.random() * this.simulationConfig.mapWidth),
-      y: 1 + int(Math.random() * this.simulationConfig.mapHeight)
+      x: 1 + int(Math.random() * this.config.map.width),
+      y: 1 + int(Math.random() * this.config.map.height)
     }
   }
 
@@ -160,10 +164,10 @@ class Simulation {
    * @return {Cell|null} if the x y coordinates are invalid null, the Cell otherwise.
    */
   getCell(x, y) {
-    if (x < 0 || x >= this.simulationConfig.mapWidth) {
+    if (x < 0 || x >= this.config.map.width) {
       return null;
     }
-    if (y < 0 || y >= this.simulationConfig.mapHeight) {
+    if (y < 0 || y >= this.config.map.height) {
       return null;
     }
     return this.cells[x][y];
@@ -250,7 +254,7 @@ class Simulation {
   decayPheromone() {
     let cellsToDelete = [];
     for (let cell in this.pheromoneCells) {
-      cell.decayPheromones(this.simulationConfig.foodPheromoneDecay, this.simulationConfig.homePheromoneDecay);
+      cell.decayPheromones(this.config.pheromones.foodDecay, this.config.pheromoneCells.homeDecay);
       if (!cell.hasAnyPheromones()) {
         cellsToDelete.push(cell);
       }
@@ -270,8 +274,15 @@ class Simulation {
   }
 
   draw() {
-    background(this.drawingConfig.backgroundColor);
+    background(this.config.map.colors.backgroundColor);
     noStroke();
+
+    if (this.config.map.drawPheromones) {
+      fill('rgba(236,142,142,0.48)');
+      this.pheromoneCells.forEach(cell => {
+        rect(cell.x, cell.y, 1, 1);
+      })
+    }
 
     this.homes.forEach((cells, index) => {
       fill(this.colonyColors[index]);
@@ -284,22 +295,24 @@ class Simulation {
       colony.forEach((ant) => {
         let antColor = this.colonyColors[index];
         if (ant.isDead) {
-          antColor = this.drawingConfig.deadAntColor;
+          antColor = this.config.map.colors.deadAntColor;
         } else if (ant.carryingFood) {
-          antColor = this.drawingConfig.antWithFoodColor;
+          antColor = this.config.map.colors.antWithFood;
         }
         fill(antColor);
-        rect(ant.x, ant.y, this.drawingConfig.antSize.x, this.drawingConfig.antSize.y);
+        rect(ant.x, ant.y, 1, 1);
       })
     });
 
-    fill(this.drawingConfig.foodColor);
+    fill(this.config.map.colors.foodColor);
     this.foods.forEach(foodCell => {
-      rect(foodCell.x, foodCell.y, this.drawingConfig.foodSize.x, this.drawingConfig.foodSize.y);
+      rect(foodCell.x, foodCell.y, 1, 1);
     });
 
     this.uiComponents.statsDiv.html(this.statsHtmlString());
-    this.uiComponents.debugDiv.html(this.debugHtmlString());
+    if (this.config.debug) {
+      this.uiComponents.debugDiv.html(this.debugHtmlString());
+    }
   }
 
   statsHtmlString() {

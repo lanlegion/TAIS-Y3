@@ -1,66 +1,3 @@
-class SimulationConfig {
-  constructor(
-    mapWidth,
-    mapHeight,
-    fps,
-    numberOfColonies,
-    antsPerColony,
-    numberOfFoodStacks,
-    foodStackSize,
-    gameSpeed,
-    foodPheromoneDecay,
-    homePheromoneDecay,
-    antRange
-  ) {
-    this.mapWidth = mapWidth;
-    this.mapHeight = mapHeight;
-    this.fps = fps;
-    this.numberOfColonies = numberOfColonies;
-    this.antsPerColony = antsPerColony;
-    this.numberOfFoodStacks = numberOfFoodStacks;
-    this.foodStackSize = foodStackSize;
-    this.gameSpeed = gameSpeed;
-    this.foodPheromoneDecay = foodPheromoneDecay;
-    this.homePheromoneDecay = homePheromoneDecay;
-    this.antRange = antRange;
-  }
-}
-
-class DrawingConfig {
-  constructor(
-    foodColor,
-    backgroundColor,
-    deadAntColor,
-    antWithFoodColor,
-    homeSize,
-    antSize,
-    foodSize,
-    colonyColors
-  ) {
-    this.foodColor = foodColor;
-    this.backgroundColor = backgroundColor;
-    this.deadAntColor = deadAntColor;
-    this.antWithFoodColor = antWithFoodColor;
-    this.homeSize = homeSize;
-    this.antSize = antSize;
-    this.foodSize = foodSize;
-    this.colonyColors = colonyColors;
-  }
-}
-
-class ProbabilityConfig {
-  constructor(
-    maintainDirectionOnRandom,
-    moveRandomWhileSeeking,
-    minScoreLimit
-  ) {
-    this.maintainDirectionOnRandom = maintainDirectionOnRandom;
-    this.turnLeftOnRandom = maintainDirectionOnRandom + (1 - maintainDirectionOnRandom) / 2;
-    this.moveRandomWhileSeeking = moveRandomWhileSeeking;
-    this.minScoreLimit = minScoreLimit;
-  }
-}
-
 class Ant {
   constructor(x, y, colony, simulation, colonyStats, health = 100, hungerSpeed = 1, carryingCapacity = 1) {
     this.simulation = simulation;
@@ -180,28 +117,14 @@ class Ant {
   moveRandomly() {
     let fwd = this.forward();
     let probability = Math.random();
-    if (probability < simulation.probabilityConfig.maintainDirectionOnRandom) {
-      this.x += fwd.x * simulation.simulationConfig.gameSpeed;
-      this.y += fwd.y * simulation.simulationConfig.gameSpeed;
-    } else if (probability < simulation.probabilityConfig.turnLeftOnRandom) {
+    if (probability < simulation.config.probabilities.maintainDirectionOnRandom) {
+      this.x += fwd.x * simulation.config.gameSpeed;
+      this.y += fwd.y * simulation.config.gameSpeed;
+    } else if (probability < simulation.config.probabilities.turnLeftOnRandom) {
       this.turnLeft();
     } else {
       this.turnRight();
     }
-  }
-
-  /**
-   * Ant moves with the purpose of finding food.
-   */
-  searchForFood() {
-    this.seek(true);
-  }
-
-  /**
-   * Ant moves with the purpose of finding home.
-   */
-  searchForHome() {
-    this.seek(false);
   }
 
   /**
@@ -223,8 +146,8 @@ class Ant {
       }
     });
 
-    if (maxScore < this.simulation.probabilityConfig.minScoreLimit
-      || Math.random() < this.simulation.probabilityConfig.moveRandomWhileSeeking) {
+    if (maxScore < this.simulation.config.probabilities.minScoreLimit
+      || Math.random() < this.simulation.config.probabilities.moveRandomWhileSeeking) {
       this.moveRandomly();
     } else if (bestDirection === forwardDirections[0]) {
       this.turnLeft();
@@ -244,7 +167,7 @@ class Ant {
    * @return {number}
    */
   getScoreForDirection(direction, lookingForFood) {
-    const range = simulation.simulationConfig.antRange;
+    const range = simulation.config.ants.sightRange;
     const x0 = this.x + direction.x * range;
     const y0 = this.y + direction.y * range;
     let score = 0;
