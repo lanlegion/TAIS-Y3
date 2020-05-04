@@ -87,11 +87,21 @@ class Simulation {
     }
   }
 
+  /**
+   * Retrieves a random Cell from the map.
+   * @return {Cell} the random cell.
+   * @private
+   */
   _getRandomCell() {
     const randomLocation = this._getRandomLocationOnMap();
     return this.getCell(randomLocation.x, randomLocation.y);
   }
 
+  /**
+   * Retrieves a random position on the map.
+   * @return {{x: number, y: number}} the random position.
+   * @private
+   */
   _getRandomLocationOnMap() {
     return {
       x: 1 + int(Math.random() * this.simulationConfig.mapWidth),
@@ -99,11 +109,17 @@ class Simulation {
     }
   }
 
-  _gatRandomSquareLocations() {
+  /**
+   * Retrieves a random square (multiple adjacent cells) from the map.
+   * @param sizes {{x: number, y: number}} the dimensions of the square.
+   * @return [Cell] the list of random Cells
+   * @private
+   */
+  _gatRandomSquareLocations(sizes = {x: 10, y: 10}) {
     let randomCells = [];
     const randomLocation = this._getRandomLocationOnMap();
-    for (let x = randomLocation.x; x < randomLocation.x + this.drawingConfig.homeSize.x; x++) {
-      for (let y = randomLocation.y; y < randomLocation.y + this.drawingConfig.homeSize.y; y++) {
+    for (let x = randomLocation.x; x < randomLocation.x + sizes.x; x++) {
+      for (let y = randomLocation.y; y < randomLocation.y + sizes.y; y++) {
         const newCell = this.getCell(x, y);
         if (newCell !== null) {
           randomCells.push(newCell);
@@ -113,10 +129,22 @@ class Simulation {
     return randomCells;
   }
 
+  /**
+   * Generates a random color string.
+   * @return {string} the color string.
+   * @private
+   */
   _getRandomColorString() {
     return '#' + Math.floor(Math.random() * 16777215).toString(16);
   }
 
+  /**
+   * Generates a pseudo-random initial position for an ant. It will be on one of the
+   * colony home cells.
+   * @param colony {number} the index of the colony of the ant.
+   * @return {{x: number, y: number}} the initial position for the ant.
+   * @private
+   */
   _getInitialPositionForAnt(colony) {
     const randomHomeCell = this.homes[colony][Math.floor(Math.random() * this.homes[colony].length)];
     return {
@@ -125,6 +153,12 @@ class Simulation {
     }
   }
 
+  /**
+   * Retrieves the cell at a given position.
+   * @param x {number}
+   * @param y {number}
+   * @return {Cell|null} if the x y coordinates are invalid null, the Cell otherwise.
+   */
   getCell(x, y) {
     if (x < 0 || x >= this.simulationConfig.mapWidth) {
       return null;
@@ -132,10 +166,13 @@ class Simulation {
     if (y < 0 || y >= this.simulationConfig.mapHeight) {
       return null;
     }
-
     return this.cells[x][y];
   }
 
+  /**
+   * Removes the food from a cell (it converts it from a FOOD cell to an EMPTY cell).
+   * @param cell {Cell} from where the food should be removed
+   */
   clearFood(cell) {
     cell.type = CellType.EMPTY;
     let index = this.foods.indexOf(cell);
@@ -176,7 +213,7 @@ class Simulation {
     let foodCurrentStats = [];
     let healthCurrentStats = [];
 
-    for(let colony = 0; colony < this.colonies.length; colony++) {
+    for (let colony = 0; colony < this.colonies.length; colony++) {
       foodCurrentStats.push(this.colonies[colony].food);
       healthCurrentStats.push(this.colonies[colony].averageHealth);
     }
@@ -242,7 +279,7 @@ class Simulation {
   }
 
   consumeFood() {
-    if(this.tick % 100 === 0) {
+    if (this.tick % 100 === 0) {
       this.colonies.forEach(colony => {
         colony.eatFood();
       });
@@ -290,9 +327,9 @@ class Simulation {
         + `Alive ants: ${colonyStats.numberOfAnts}  `
         + `Dead ants: ${colonyStats.numberOfDeadAnts}  `
         + `Avg health:  ${colonyStats.averageHealth}  `
-        +`<br></span>`
+        + `<br></span>`
 
-      if(colonyStats.numberOfAnts === 0) {
+      if (colonyStats.numberOfAnts === 0) {
         tempString = '<strike>' + tempString + '</strike>';
       }
       prettyString += tempString;
