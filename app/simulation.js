@@ -227,17 +227,26 @@ class Simulation {
     this.charts.healthChart.pushData(healthCurrentStats, this.tick);
   }
 
-  antLeavesPheromone(ant, currentCell) {
+  /**
+   * Leaving pheromone from ants based on its activity.
+   * @param ant {Ant} the ant which leaves pheromone.
+   * @param currentCell {Cell} the cell on which the ant is.
+   * @param quantity {number} the quantity of pheromone which is left by the ant.
+   */
+  antLeavesPheromone(ant, currentCell, quantity = 1) {
     if (currentCell !== null && !ant.isDead && (ant.x !== currentCell.x || ant.y !== currentCell.y)) {
       if (ant.carryingFood) {
-        currentCell.addFoodPheromone(1, ant.colony);
+        currentCell.addFoodPheromone(quantity, ant.colony);
       } else {
-        currentCell.addHomePheromone(1, ant.colony);
+        currentCell.addHomePheromone(quantity, ant.colony);
       }
       this.pheromoneCells.add(currentCell);
     }
   }
 
+  /**
+   * Decay the pheromones over time.
+   */
   decayPheromone() {
     let cellsToDelete = [];
     for (let cell in this.pheromoneCells) {
@@ -251,6 +260,9 @@ class Simulation {
     });
   }
 
+  /**
+   * Consume food over time.
+   */
   consumeFood() {
     if (this.tick % 100 === 0) {
       this.colonies.forEach(colony => {
