@@ -3,6 +3,7 @@ const ANT_SIM_CONFIG = {
     drawPheromones: false,
     width: 100, // In pixels
     height: 100, // In pixels
+    cleanupInterval: 100,
     colors: {
       colony: [
         '#f0f64d',
@@ -28,7 +29,7 @@ const ANT_SIM_CONFIG = {
   fps: 60, // Pretty irrelevant
   gameSpeed: 1,
   ants: {
-    numberOfColonies: 2,
+    numberOfColonies: 6,
     antsPerColony: 350,
     sightRange: 5,
     maxHealth: 100,
@@ -37,7 +38,10 @@ const ANT_SIM_CONFIG = {
     bornDeviation: 2,
     averageLifeSpan: 2000, // Measured in ticks
     lifeSpanDeviation: 400, // Measured in ticks
-    hitDamage: 20
+    hitDamage: 20,
+    hitDeviation: 5,
+    extraHitPowerFromFood: 0.005,
+    minimumAntsForCreation: 10
   },
   food: {
     numberOfFoodStacks: 10,

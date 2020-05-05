@@ -62,6 +62,13 @@ class Simulation {
       this.config.ants.averageLifeSpan + this.config.ants.lifeSpanDeviation);
   }
 
+  _randomHitDamage() {
+    return this.randomIntFromInterval(
+      this.config.ants.hitDamage - this.config.ants.hitDeviation,
+      this.config.ants.hitDamage + this.config.ants.hitDeviation
+    );
+  }
+
   _initAnts() {
     console.log('Initializing ants');
     this.ants = [];
@@ -84,7 +91,7 @@ class Simulation {
             this.config.food.starveSpeed,
             this.config.food.healingSpeed,
             this._randomAntExpectancy(),
-            this.config.ants.hitDamage));
+            this._randomHitDamage()));
       }
     }
   }
@@ -231,8 +238,10 @@ class Simulation {
     this.ants.forEach((colony, index) => {
       let totalColonyHealth = 0;
       let totalColonyAge = 0;
+      let numberOfAliveAnts = 0;
       colony.forEach(ant => {
-        if(!ant.isDead) {
+        if (!ant.isDead) {
+          numberOfAliveAnts += 1;
           if (newAntsOnMap[ant.x] === undefined) {
             newAntsOnMap[ant.x] = {};
           }
@@ -248,14 +257,17 @@ class Simulation {
           this.antLeavesPheromone(ant, this.getCell(ant.x, ant.y));
         }
       });
-      this.colonies[index].averageHealth = totalColonyHealth / colony.length;
-      this.colonies[index].averageAge = totalColonyAge / colony.length;
+      this.colonies[index].averageHealth = totalColonyHealth / numberOfAliveAnts;
+      this.colonies[index].averageAge = totalColonyAge / numberOfAliveAnts;
     });
     this.antsOnMap = newAntsOnMap;
     this.decayPheromone();
     this.consumeFood();
     this.bornAnts();
     this._updateCharts(isDrawing);
+    if (this.tick % this.config.cleanupInterval === 0) {
+      this.cleanup();
+    }
   }
 
   /**
@@ -333,7 +345,9 @@ class Simulation {
   bornAnts() {
     let anyAntsBorn = false;
     this.colonies.forEach((colony, index) => {
-      if (colony.food > this.config.food.birthsThreshold && this.tick % this.config.ants.bornInterval === 0) {
+      if (colony.food > this.config.food.birthsThreshold
+        && colony.numberOfAnts > this.config.ants.minimumAntsForCreation
+        && this.tick % this.config.ants.bornInterval === 0) {
         this.bornAntsInColony(index, colony);
         anyAntsBorn = true;
       }
@@ -441,5 +455,10 @@ class Simulation {
   debugHtmlString() {
     let prettyString = `Tick: ${this.tick}<br>Cells with pheromone in set: ${this.pheromoneCells.size}`;
     return prettyString;
+  }
+
+  cleanup() {
+    console.log('Cleaning up!');
+
   }
 }

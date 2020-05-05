@@ -47,7 +47,8 @@ class Ant {
     if(this.simulation.antsOnMap[forwardCell.x] !== undefined && this.simulation.antsOnMap[forwardCell.x][forwardCell.y] !== undefined) {
       this.simulation.antsOnMap[forwardCell.x][forwardCell.y].forEach(ant => {
         if(ant.colony !== this.colony) {
-          ant.receiveDamage(this.damageHit);
+          const currentDamageHit = this.damageHit + (this.colonyStats.food * this.simulation.config.ants.extraHitPowerFromFood);
+          ant.receiveDamage(currentDamageHit);
         }
       });
     }
@@ -261,6 +262,10 @@ class Ant {
   }
 
   receiveDamage(damageAmount) {
+    if(this.isDead) {
+      return;
+    }
+
     this.health = max(0, this.health - damageAmount);
     if(this.health === 0) {
       this.isDead = true;
