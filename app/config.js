@@ -3,7 +3,6 @@ const ANT_SIM_CONFIG = {
     drawPheromones: false,
     width: 100, // In pixels
     height: 100, // In pixels
-    cleanupInterval: 100,
     colors: {
       colony: [
         '#f0f64d',
@@ -70,5 +69,6 @@ const ANT_SIM_CONFIG = {
   },
   debug: true,
   drawingTicks: 10,
-  playSounds: false
+  playSounds: false,
+  cleanupInterval: 100
 };

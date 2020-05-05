@@ -458,7 +458,20 @@ class Simulation {
   }
 
   cleanup() {
-    console.log('Cleaning up!');
-
+    let newColonies = [];
+    let cleanedAnts = 0;
+    for (let colony = 0; colony < this.config.ants.numberOfColonies; colony++) {
+      let oneNewColony = [];
+      this.ants[colony].forEach(ant => {
+        if(!ant.isDead) {
+          oneNewColony.push(ant);
+        } else {
+          cleanedAnts ++;
+        }
+      });
+      newColonies.push(oneNewColony);
+    }
+    this.ants = newColonies;
+    console.log(`Cleaned ${cleanedAnts} dead ants`);
   }
 }
