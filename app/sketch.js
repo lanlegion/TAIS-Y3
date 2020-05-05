@@ -10,7 +10,11 @@ function setup() {
   createCanvas(ANT_SIM_CONFIG.map.width, ANT_SIM_CONFIG.map.height);
   frameRate(ANT_SIM_CONFIG.fps);
 
-  const uiComponents = new UiComponents(select('#stats_div'), select('#debug_div'));
+  const audioContainers = {
+    born: document.getElementById('audio_container_born')
+  };
+
+  const uiComponents = new UiComponents(select('#stats_div'), select('#debug_div'), audioContainers);
 
   const foodChart = new AntsChart(
     ANT_SIM_CONFIG.ants.numberOfColonies,

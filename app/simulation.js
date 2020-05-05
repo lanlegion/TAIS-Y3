@@ -314,7 +314,9 @@ class Simulation {
       }
     });
     if(anyAntsBorn) {
-      //new Audio('docs/born.mp3').play();
+      this.uiComponents.audioContainers.born.play().catch(reason => {
+        console.error(reason);
+      });
     }
   }
 
