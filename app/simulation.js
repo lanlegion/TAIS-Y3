@@ -241,14 +241,20 @@ class Simulation {
 
     let foodCurrentStats = [];
     let healthCurrentStats = [];
+    let populationCurrentStats = [];
+    let deadCurrentStats = [];
 
     for (let colony = 0; colony < this.colonies.length; colony++) {
       foodCurrentStats.push(this.colonies[colony].food);
       healthCurrentStats.push(this.colonies[colony].averageHealth);
+      populationCurrentStats.push(this.colonies[colony].numberOfAnts);
+      deadCurrentStats.push(this.colonies[colony].numberOfDeadAnts);
     }
 
     this.charts.foodChart.pushData(foodCurrentStats, this.tick);
     this.charts.healthChart.pushData(healthCurrentStats, this.tick);
+    this.charts.populationChart.pushData(populationCurrentStats, this.tick);
+    this.charts.deadChart.pushData(deadCurrentStats, this.tick);
   }
 
   /**
@@ -313,7 +319,7 @@ class Simulation {
         anyAntsBorn = true;
       }
     });
-    if(anyAntsBorn) {
+    if(this.config.playSounds && anyAntsBorn) {
       this.uiComponents.audioContainers.born.play().catch(reason => {
         console.error(reason);
       });

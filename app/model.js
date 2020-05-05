@@ -394,7 +394,6 @@ class ColonyStats {
    * Signals the born of a new ant.
    */
   antBorn() {
-    console.log(`Ant born for colony ${this.index}`);
     this.numberOfAnts += 1;
   }
 }

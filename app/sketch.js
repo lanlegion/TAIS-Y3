@@ -32,9 +32,27 @@ function setup() {
     ANT_SIM_CONFIG.charts.lengthThreshold,
     ANT_SIM_CONFIG.charts.aggregationSize);
 
+  const populationChart = new AntsChart(
+    ANT_SIM_CONFIG.ants.numberOfColonies,
+    ANT_SIM_CONFIG.map.colors.colony,
+    'population_chart',
+    'Population',
+    ANT_SIM_CONFIG.charts.lengthThreshold,
+    ANT_SIM_CONFIG.charts.aggregationSize);
+
+  const deadChart = new AntsChart(
+    ANT_SIM_CONFIG.ants.numberOfColonies,
+    ANT_SIM_CONFIG.map.colors.colony,
+    'dead_chart',
+    'Dead ants',
+    ANT_SIM_CONFIG.charts.lengthThreshold,
+    ANT_SIM_CONFIG.charts.aggregationSize);
+
   const charts = {
     foodChart: foodChart,
-    healthChart: healthChart
+    healthChart: healthChart,
+    populationChart: populationChart,
+    deadChart: deadChart
   }
 
   simulation = new Simulation(ANT_SIM_CONFIG, uiComponents, charts);

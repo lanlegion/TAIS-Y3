@@ -61,4 +61,5 @@ const ANT_SIM_CONFIG = {
   },
   debug: true,
   drawingTicks: 10,
+  playSounds: false
 };
