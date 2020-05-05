@@ -5,6 +5,10 @@ class Simulation {
     this.config = config;
     this.uiComponents = uiComponents;
     this.charts = charts;
+    this.chartsCache = {
+      food: [],
+      health: []
+    }
 
     this.tick = 0;
 
@@ -221,6 +225,10 @@ class Simulation {
    * @private
    */
   _updateCharts() {
+    if (this.tick % this.config.charts.intervalPush !== 0) {
+      return;
+    }
+
     let foodCurrentStats = [];
     let healthCurrentStats = [];
 
@@ -276,7 +284,7 @@ class Simulation {
   }
 
   draw() {
-    if (this.tick % 10 !== 0) {
+    if (this.tick % this.config.drawingTicks !== 0) {
       return;
     }
 

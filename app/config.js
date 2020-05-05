@@ -31,7 +31,8 @@ const ANT_SIM_CONFIG = {
     numberOfColonies: 5,
     antsPerColony: 150,
     sightRange: 5,
-    maxHealth: 100
+    maxHealth: 100,
+    bornInterval: 10
   },
   food: {
     numberOfFoodStacks: 100,
@@ -53,5 +54,11 @@ const ANT_SIM_CONFIG = {
     minScoreLimit: 0.01,
     turnLeftOnRandom: 0.875
   },
+  charts: {
+    lengthThreshold: 100,
+    aggregationSize: 10,
+    intervalPush: 10,
+  },
   debug: true,
+  drawingTicks: 10,
 };

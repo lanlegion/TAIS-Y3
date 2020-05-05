@@ -12,8 +12,21 @@ function setup() {
 
   const uiComponents = new UiComponents(select('#stats_div'), select('#debug_div'));
 
-  const foodChart = new AntsChart(ANT_SIM_CONFIG.ants.numberOfColonies, ANT_SIM_CONFIG.map.colors.colony, 'food_chart', 'Food');
-  const healthChart = new AntsChart(ANT_SIM_CONFIG.ants.numberOfColonies, ANT_SIM_CONFIG.map.colors.colony, 'health_chart', 'Health');
+  const foodChart = new AntsChart(
+    ANT_SIM_CONFIG.ants.numberOfColonies,
+    ANT_SIM_CONFIG.map.colors.colony,
+    'food_chart',
+    'Food',
+    ANT_SIM_CONFIG.charts.lengthThreshold,
+    ANT_SIM_CONFIG.charts.aggregationSize);
+
+  const healthChart = new AntsChart(
+    ANT_SIM_CONFIG.ants.numberOfColonies,
+    ANT_SIM_CONFIG.map.colors.colony,
+    'health_chart',
+    'Health',
+    ANT_SIM_CONFIG.charts.lengthThreshold,
+    ANT_SIM_CONFIG.charts.aggregationSize);
 
   const charts = {
     foodChart: foodChart,

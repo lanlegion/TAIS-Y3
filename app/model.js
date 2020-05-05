@@ -228,7 +228,6 @@ class Ant {
     if (this.colonyStats.food > currentHunger) {
       this.health = min(this.maxHealth, this.health + this.healingSpeed);
       this.colonyStats.food -= currentHunger;
-      console.log('decrease');
     } else {
       this.health = max(0, this.health - currentStarving);
       if (this.health === 0) {
