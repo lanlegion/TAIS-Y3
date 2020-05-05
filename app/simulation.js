@@ -286,11 +286,19 @@ class Simulation {
     let averageAge = [];
 
     for (let colony = 0; colony < this.colonies.length; colony++) {
-      foodCurrentStats.push(this.colonies[colony].food);
-      healthCurrentStats.push(this.colonies[colony].averageHealth);
-      populationCurrentStats.push(this.colonies[colony].numberOfAnts);
-      deadCurrentStats.push(this.colonies[colony].numberOfDeadAnts);
-      averageAge.push(this.colonies[colony].averageAge);
+      if (this.colonies[colony].numberOfAnts === 0) {
+        foodCurrentStats.push(null);
+        healthCurrentStats.push(null);
+        populationCurrentStats.push(null);
+        deadCurrentStats.push(null);
+        averageAge.push(null);
+      } else {
+        foodCurrentStats.push(this.colonies[colony].food);
+        healthCurrentStats.push(this.colonies[colony].averageHealth);
+        populationCurrentStats.push(this.colonies[colony].numberOfAnts);
+        deadCurrentStats.push(this.colonies[colony].numberOfDeadAnts);
+        averageAge.push(this.colonies[colony].averageAge);
+      }
     }
 
     this.charts.foodChart.pushData(foodCurrentStats, this.tick, isDrawing);
@@ -463,10 +471,10 @@ class Simulation {
     for (let colony = 0; colony < this.config.ants.numberOfColonies; colony++) {
       let oneNewColony = [];
       this.ants[colony].forEach(ant => {
-        if(!ant.isDead) {
+        if (!ant.isDead) {
           oneNewColony.push(ant);
         } else {
-          cleanedAnts ++;
+          cleanedAnts++;
         }
       });
       newColonies.push(oneNewColony);
