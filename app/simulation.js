@@ -226,6 +226,7 @@ class Simulation {
     });
     this.decayPheromone();
     this.consumeFood();
+    this.bornAnts();
     this._updateCharts();
   }
 
@@ -292,6 +293,31 @@ class Simulation {
     });
   }
 
+  bornAnts() {
+    let anyAntsBorn = false;
+    this.colonies.forEach((colony, index) => {
+      if (colony.food > this.config.food.birthsThreshold && this.tick % this.config.ants.bornInterval === 0) {
+        const initialPosition = this._getInitialPositionForAnt(index);
+        const newborn = new Ant(
+          initialPosition.x,
+          initialPosition.y,
+          index,
+          this,
+          colony,
+          this.config.ants.maxHealth,
+          this.config.food.antHunger,
+          this.config.food.starveSpeed,
+          this.config.food.healingSpeed);
+        this.ants[index].push(newborn);
+        colony.antBorn();
+        anyAntsBorn = true;
+      }
+    });
+    if(anyAntsBorn) {
+      //new Audio('docs/born.mp3').play();
+    }
+  }
+
   draw() {
     if (this.tick % this.config.drawingTicks !== 0) {
       return;
@@ -342,10 +368,10 @@ class Simulation {
     let prettyString = '';
     this.colonies.forEach((colonyStats, index) => {
       let tempString = `<span style="color:${this.colonyColors[index]}">Colony id: ${colonyStats.index}  `
-        + `Food: ${colonyStats.food}  `
+        + `Food: ${colonyStats.food.toFixed(2)}  `
         + `Alive ants: ${colonyStats.numberOfAnts}  `
         + `Dead ants: ${colonyStats.numberOfDeadAnts}  `
-        + `Avg health:  ${colonyStats.averageHealth}  `
+        + `Avg health:  ${colonyStats.averageHealth.toFixed(2)}  `
         + `<br></span>`
 
       if (colonyStats.numberOfAnts === 0) {

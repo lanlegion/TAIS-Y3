@@ -40,7 +40,7 @@ const ANT_SIM_CONFIG = {
     foodItemValue: 1,
     antHunger: 0.007,
     lunchInterval: 100,
-    birthsThreshold: 400,
+    birthsThreshold: 100,
     starveSpeed: 0.033,
     healingSpeed: 0.2
   },
