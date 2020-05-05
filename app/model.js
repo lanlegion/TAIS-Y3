@@ -44,9 +44,9 @@ class Ant {
       return;
     }
 
-    if(this.simulation.antsOnMap[forwardCell.x] !== undefined && this.simulation.antsOnMap[forwardCell.x][forwardCell.y] !== undefined) {
+    if (this.simulation.antsOnMap[forwardCell.x] !== undefined && this.simulation.antsOnMap[forwardCell.x][forwardCell.y] !== undefined) {
       this.simulation.antsOnMap[forwardCell.x][forwardCell.y].forEach(ant => {
-        if(ant.colony !== this.colony) {
+        if (ant.colony !== this.colony) {
           const currentDamageHit = this.damageHit + (this.colonyStats.food * this.simulation.config.ants.extraHitPowerFromFood);
           ant.receiveDamage(currentDamageHit);
         }
@@ -262,12 +262,12 @@ class Ant {
   }
 
   receiveDamage(damageAmount) {
-    if(this.isDead) {
+    if (this.isDead) {
       return;
     }
 
     this.health = max(0, this.health - damageAmount);
-    if(this.health === 0) {
+    if (this.health === 0) {
       this.isDead = true;
       this.colonyStats.antDied();
     }
@@ -278,6 +278,7 @@ class Pheromones {
   constructor() {
     this.food = {};
     this.home = {};
+    this.existingLimit = ANT_SIM_CONFIG.pheromones.existingLimit;
   }
 
   /**
@@ -286,16 +287,37 @@ class Pheromones {
    */
   hasAnyPheromones() {
     for (let foodKey in this.food) {
-      if (this.food[foodKey] > 0.01) {
+      if (this.food[foodKey] > this.existingLimit) {
         return true;
       }
     }
     for (let homeKey in this.home) {
-      if (this.home[homeKey] > 0.01) {
+      if (this.home[homeKey] > this.existingLimit) {
         return true;
       }
     }
     return false;
+  }
+
+  clean() {
+    let homeCleanedPerColony = 0;
+    let foodCleanedPerColony = 0;
+    for (let foodKey in this.food) {
+      if (this.food[foodKey] <= this.existingLimit) {
+        delete this.food[foodKey];
+        foodCleanedPerColony++;
+      }
+    }
+    for (let homeKey in this.home) {
+      if (this.home[homeKey] <= this.existingLimit) {
+        delete this.home[homeKey];
+        homeCleanedPerColony++;
+      }
+    }
+    return {
+      food: foodCleanedPerColony,
+      home: homeCleanedPerColony
+    }
   }
 }
 
@@ -384,6 +406,10 @@ class Cell {
    */
   hasAnyPheromones() {
     return this.pheromones.hasAnyPheromones();
+  }
+
+  cleanPheromones() {
+    return this.pheromones.clean();
   }
 }
 

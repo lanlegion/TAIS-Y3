@@ -481,5 +481,18 @@ class Simulation {
     }
     this.ants = newColonies;
     console.log(`Cleaned ${cleanedAnts} dead ants`);
+
+    let cleanedPheromoneColonyCells = {
+      home: 0,
+      food: 0
+    };
+    this.cells.forEach(row => {
+      row.forEach(cell => {
+        const cleanResult = cell.cleanPheromones();
+        cleanedPheromoneColonyCells.food += cleanResult.food;
+        cleanedPheromoneColonyCells.home += cleanResult.home;
+      });
+    });
+    console.log(`Cleaned pheromones: food - ${cleanedPheromoneColonyCells.food}   home - ${cleanedPheromoneColonyCells.home}`);
   }
 }
