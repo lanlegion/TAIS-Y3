@@ -9,6 +9,7 @@ class Simulation {
       food: [],
       health: []
     }
+    this.antsOnMap = {};
 
     this.tick = 0;
 
@@ -82,7 +83,8 @@ class Simulation {
             this.config.food.antHunger,
             this.config.food.starveSpeed,
             this.config.food.healingSpeed,
-            this._randomAntExpectancy()));
+            this._randomAntExpectancy(),
+            this.config.ants.hitDamage));
       }
     }
   }
@@ -224,21 +226,32 @@ class Simulation {
    * Executes one tick of the simulation.
    */
   run(isDrawing) {
+    let newAntsOnMap = {};
     this.tick++;
     this.ants.forEach((colony, index) => {
       let totalColonyHealth = 0;
       let totalColonyAge = 0;
       colony.forEach(ant => {
-        totalColonyHealth += ant.health;
-        totalColonyAge += ant.age;
-        ant.move();
-        ant.eatFood();
-        ant.aging();
-        this.antLeavesPheromone(ant, this.getCell(ant.x, ant.y))
+        if(!ant.isDead) {
+          if (newAntsOnMap[ant.x] === undefined) {
+            newAntsOnMap[ant.x] = {};
+          }
+          if (newAntsOnMap[ant.x][ant.y] === undefined) {
+            newAntsOnMap[ant.x][ant.y] = [];
+          }
+          newAntsOnMap[ant.x][ant.y].push(ant);
+          totalColonyHealth += ant.health;
+          totalColonyAge += ant.age;
+          ant.move();
+          ant.eatFood();
+          ant.aging();
+          this.antLeavesPheromone(ant, this.getCell(ant.x, ant.y));
+        }
       });
       this.colonies[index].averageHealth = totalColonyHealth / colony.length;
       this.colonies[index].averageAge = totalColonyAge / colony.length;
     });
+    this.antsOnMap = newAntsOnMap;
     this.decayPheromone();
     this.consumeFood();
     this.bornAnts();
@@ -350,7 +363,8 @@ class Simulation {
         this.config.food.antHunger,
         this.config.food.starveSpeed,
         this.config.food.healingSpeed,
-        this._randomAntExpectancy());
+        this._randomAntExpectancy(),
+        this.config.ants.hitDamage);
       this.ants[colonyId].push(newborn);
       colony.antBorn();
     }

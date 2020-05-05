@@ -1,5 +1,5 @@
 class Ant {
-  constructor(x, y, colony, simulation, colonyStats, health, hungerSpeed, starveSpeed, healingSpeed, lifeSpan) {
+  constructor(x, y, colony, simulation, colonyStats, health, hungerSpeed, starveSpeed, healingSpeed, lifeSpan, damageHit) {
     this.simulation = simulation;
     this.x = x;
     this.y = y;
@@ -26,6 +26,7 @@ class Ant {
     this.healingSpeed = healingSpeed;
     this.lifeSpan = lifeSpan;
     this.age = 0;
+    this.damageHit = damageHit;
   }
 
   /**
@@ -41,6 +42,14 @@ class Ant {
     if (forwardCell === null) {
       this.randomizeDirection();
       return;
+    }
+
+    if(this.simulation.antsOnMap[forwardCell.x] !== undefined && this.simulation.antsOnMap[forwardCell.x][forwardCell.y] !== undefined) {
+      this.simulation.antsOnMap[forwardCell.x][forwardCell.y].forEach(ant => {
+        if(ant.colony !== this.colony) {
+          ant.receiveDamage(this.damageHit);
+        }
+      });
     }
 
     if (this.carryingFood && forwardCell.type === CellType.HOME) {
@@ -246,6 +255,14 @@ class Ant {
 
     this.age++;
     if (this.age >= this.lifeSpan) {
+      this.isDead = true;
+      this.colonyStats.antDied();
+    }
+  }
+
+  receiveDamage(damageAmount) {
+    this.health = max(0, this.health - damageAmount);
+    if(this.health === 0) {
       this.isDead = true;
       this.colonyStats.antDied();
     }
