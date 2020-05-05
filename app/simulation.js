@@ -12,11 +12,12 @@ class Simulation {
 
     this.tick = 0;
 
+    let occupiedCells = new Set();
     this._initCells();
-    this._initHomes();
+    this._initHomes(occupiedCells);
     this._initAnts();
     this._initColoniesColors();
-    this._initFoodStacks();
+    this._initFoodStacks(occupiedCells);
 
     console.log('Simulation initialization complete!');
   }
@@ -34,14 +35,17 @@ class Simulation {
     }
   }
 
-  _initHomes() {
+  _initHomes(occupiedCells) {
     console.log('Initializing homes');
     this.homes = [];
     for (let colony = 0; colony < this.config.ants.numberOfColonies; colony++) {
       let colonyHomes = [];
       this._gatRandomSquareLocations().forEach(cell => {
-        cell.type = CellType.HOME;
-        colonyHomes.push(cell);
+        if (!occupiedCells.has(`${cell.x}-${cell.y}`)) {
+          occupiedCells.add(`${cell.x}-${cell.y}`);
+          cell.type = CellType.HOME;
+          colonyHomes.push(cell);
+        }
       });
       this.homes.push(colonyHomes);
     }
@@ -80,7 +84,7 @@ class Simulation {
     }
   }
 
-  _initFoodStacks() {
+  _initFoodStacks(occupiedCells) {
     console.log('Initializing food stacks');
     this.foods = [];
     for (let food = 0; food < this.config.food.numberOfFoodStacks; food++) {
@@ -89,6 +93,11 @@ class Simulation {
            x < randomLocation.x + this.config.food.foodStackSize && x < this.config.map.width; x++) {
         for (let y = randomLocation.y;
              y < randomLocation.y + this.config.food.foodStackSize && y < this.config.map.height; y++) {
+
+          if (occupiedCells.has(`${x}-${y}`)) {
+            continue;
+          }
+          occupiedCells.add(`${x}-${y}`);
           const currentCell = this.cells[x][y];
           currentCell.type = CellType.FOOD;
           this.foods.push(currentCell);

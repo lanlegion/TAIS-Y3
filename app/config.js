@@ -35,8 +35,8 @@ const ANT_SIM_CONFIG = {
     bornInterval: 10
   },
   food: {
-    numberOfFoodStacks: 100,
-    foodStackSize: 20,
+    numberOfFoodStacks: 20,
+    foodStackSize: 100,
     foodItemValue: 1,
     antHunger: 0.007,
     lunchInterval: 100,
