@@ -223,30 +223,33 @@ class Simulation {
   /**
    * Executes one tick of the simulation.
    */
-  run() {
+  run(isDrawing) {
     this.tick++;
     this.ants.forEach((colony, index) => {
       let totalColonyHealth = 0;
+      let totalColonyAge = 0;
       colony.forEach(ant => {
         totalColonyHealth += ant.health;
+        totalColonyAge += ant.age;
         ant.move();
         ant.eatFood();
         ant.aging();
         this.antLeavesPheromone(ant, this.getCell(ant.x, ant.y))
       });
       this.colonies[index].averageHealth = totalColonyHealth / colony.length;
+      this.colonies[index].averageAge = totalColonyAge / colony.length;
     });
     this.decayPheromone();
     this.consumeFood();
     this.bornAnts();
-    this._updateCharts();
+    this._updateCharts(isDrawing);
   }
 
   /**
    * Adds the data from this tick of the simulation to the charts.
    * @private
    */
-  _updateCharts() {
+  _updateCharts(isDrawing) {
     if (this.tick % this.config.charts.intervalPush !== 0) {
       return;
     }
@@ -255,18 +258,21 @@ class Simulation {
     let healthCurrentStats = [];
     let populationCurrentStats = [];
     let deadCurrentStats = [];
+    let averageAge = [];
 
     for (let colony = 0; colony < this.colonies.length; colony++) {
       foodCurrentStats.push(this.colonies[colony].food);
       healthCurrentStats.push(this.colonies[colony].averageHealth);
       populationCurrentStats.push(this.colonies[colony].numberOfAnts);
       deadCurrentStats.push(this.colonies[colony].numberOfDeadAnts);
+      averageAge.push(this.colonies[colony].averageAge);
     }
 
-    this.charts.foodChart.pushData(foodCurrentStats, this.tick);
-    this.charts.healthChart.pushData(healthCurrentStats, this.tick);
-    this.charts.populationChart.pushData(populationCurrentStats, this.tick);
-    this.charts.deadChart.pushData(deadCurrentStats, this.tick);
+    this.charts.foodChart.pushData(foodCurrentStats, this.tick, isDrawing);
+    this.charts.healthChart.pushData(healthCurrentStats, this.tick, isDrawing);
+    this.charts.populationChart.pushData(populationCurrentStats, this.tick, isDrawing);
+    this.charts.deadChart.pushData(deadCurrentStats, this.tick, isDrawing);
+    this.charts.ageChart.pushData(averageAge, this.tick, isDrawing);
   }
 
   /**
@@ -350,8 +356,17 @@ class Simulation {
     }
   }
 
-  draw() {
+  draw(isDrawing) {
     if (this.tick % this.config.drawingTicks !== 0) {
+      return;
+    }
+
+    this.uiComponents.statsDiv.html(this.statsHtmlString());
+    if (this.config.debug) {
+      this.uiComponents.debugDiv.html(this.debugHtmlString());
+    }
+
+    if (!isDrawing) {
       return;
     }
 
@@ -389,11 +404,6 @@ class Simulation {
     this.foods.forEach(foodCell => {
       rect(foodCell.x, foodCell.y, 1, 1);
     });
-
-    this.uiComponents.statsDiv.html(this.statsHtmlString());
-    if (this.config.debug) {
-      this.uiComponents.debugDiv.html(this.debugHtmlString());
-    }
   }
 
   statsHtmlString() {

@@ -62,7 +62,8 @@ class AntsChart {
       let dataset = {
         label: `Colony ${colony}`,
         borderColor: this.colors[colony],
-        data: []
+        data: [],
+        fill: false,
       }
       this.config.data.datasets.push(dataset);
     }
@@ -75,8 +76,9 @@ class AntsChart {
    * Pushed a set of data point for the same moment in time.
    * @param data - list of real values (data.length must be equal to the number of colonies)
    * @param tick - the moment in time
+   * @param isDrawing - update the ui charts if true
    */
-  pushData(data, tick) {
+  pushData(data, tick, isDrawing) {
     if (data.length !== this.numOfColonies) {
       throw new Error("Data size not equal to number of colonies");
     }
@@ -87,7 +89,9 @@ class AntsChart {
     this.config.data.labels.push(tick);
     this.dataSize ++;
 
-    this.myLine.update();
+    if(isDrawing) {
+      this.myLine.update();
+    }
   }
 
   /**

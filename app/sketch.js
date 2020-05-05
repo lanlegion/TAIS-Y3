@@ -1,9 +1,14 @@
 let simulation;
 let isRunning = true;
+let isDrawing = true;
 
 // Switches on and off the simulation
 function switchRunning() {
   isRunning = !isRunning;
+}
+
+function switchDrawing() {
+  isDrawing = !isDrawing;
 }
 
 function setup() {
@@ -48,11 +53,20 @@ function setup() {
     ANT_SIM_CONFIG.charts.lengthThreshold,
     ANT_SIM_CONFIG.charts.aggregationSize);
 
+  const ageChart = new AntsChart(
+    ANT_SIM_CONFIG.ants.numberOfColonies,
+    ANT_SIM_CONFIG.map.colors.colony,
+    'age_chart',
+    'Average age',
+    ANT_SIM_CONFIG.charts.lengthThreshold,
+    ANT_SIM_CONFIG.charts.aggregationSize);
+
   const charts = {
     foodChart: foodChart,
     healthChart: healthChart,
     populationChart: populationChart,
-    deadChart: deadChart
+    deadChart: deadChart,
+    ageChart: ageChart
   }
 
   simulation = new Simulation(ANT_SIM_CONFIG, uiComponents, charts);
@@ -60,7 +74,7 @@ function setup() {
 
 function draw() {
   if (isRunning) {
-    simulation.run();
-    simulation.draw();
+    simulation.run(isDrawing);
+    simulation.draw(isDrawing);
   }
 }
