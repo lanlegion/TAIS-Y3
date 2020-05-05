@@ -7,6 +7,7 @@ function switchRunning() {
   isRunning = !isRunning;
 }
 
+// Switches on and off the map rendering and charts live updates
 function switchDrawing() {
   isDrawing = !isDrawing;
 }

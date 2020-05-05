@@ -249,6 +249,9 @@ class Ant {
     }
   }
 
+  /**
+   * Advances the ant in age. If it reaches its age limit, it dies.
+   */
   aging() {
     if (this.isDead) {
       return;
@@ -261,6 +264,10 @@ class Ant {
     }
   }
 
+  /**
+   * Receives the damage from another ant. If health reaches 0, it dies.
+   * @param damageAmount the damage to e received.
+   */
   receiveDamage(damageAmount) {
     if (this.isDead) {
       return;
@@ -299,6 +306,10 @@ class Pheromones {
     return false;
   }
 
+  /**
+   * Removes the almost empty pheromones.
+   * @return {{food: number, home: number}} - the number of food and home pheromones which were cleaned.
+   */
   clean() {
     let homeCleanedPerColony = 0;
     let foodCleanedPerColony = 0;
@@ -408,6 +419,10 @@ class Cell {
     return this.pheromones.hasAnyPheromones();
   }
 
+  /**
+   * Removes the almost empty pheromones.
+   * @return {{food: number, home: number}} - the number of food and home pheromones which were cleaned.
+   */
   cleanPheromones() {
     return this.pheromones.clean();
   }

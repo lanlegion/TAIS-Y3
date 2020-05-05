@@ -254,19 +254,19 @@ class Simulation {
           ant.move();
           ant.eatFood();
           ant.aging();
-          this.antLeavesPheromone(ant, this.getCell(ant.x, ant.y));
+          this._antLeavesPheromone(ant, this.getCell(ant.x, ant.y));
         }
       });
       this.colonies[index].averageHealth = totalColonyHealth / numberOfAliveAnts;
       this.colonies[index].averageAge = totalColonyAge / numberOfAliveAnts;
     });
     this.antsOnMap = newAntsOnMap;
-    this.decayPheromone();
-    this.consumeFood();
-    this.bornAnts();
+    this._decayPheromone();
+    this._consumeFood();
+    this._bornAnts();
     this._updateCharts(isDrawing);
     if (this.tick % this.config.cleanupInterval === 0) {
-      this.cleanup();
+      this._cleanup();
     }
   }
 
@@ -314,7 +314,7 @@ class Simulation {
    * @param currentCell {Cell} the cell on which the ant is.
    * @param quantity {number} the quantity of pheromone which is left by the ant.
    */
-  antLeavesPheromone(ant, currentCell, quantity = 1) {
+  _antLeavesPheromone(ant, currentCell, quantity = 1) {
     if (currentCell !== null && !ant.isDead) {
       if (ant.carryingFood) {
         currentCell.addFoodPheromone(quantity, ant.colony);
@@ -328,7 +328,7 @@ class Simulation {
   /**
    * Decay the pheromones over time.
    */
-  decayPheromone() {
+  _decayPheromone() {
     let cellsToDelete = [];
     for (let cell in this.pheromoneCells) {
       cell.decayPheromones(this.config.pheromones.foodDecay, this.config.pheromoneCells.homeDecay);
@@ -344,19 +344,23 @@ class Simulation {
   /**
    * Consume food over time.
    */
-  consumeFood() {
+  _consumeFood() {
     this.colonies.forEach(colony => {
       colony.eatFood();
     });
   }
 
-  bornAnts() {
+  /**
+   * Creates new ants for each colony based on its stats.
+   * @private
+   */
+  _bornAnts() {
     let anyAntsBorn = false;
     this.colonies.forEach((colony, index) => {
       if (colony.food > this.config.food.birthsThreshold
         && colony.numberOfAnts > this.config.ants.minimumAntsForCreation
         && this.tick % this.config.ants.bornInterval === 0) {
-        this.bornAntsInColony(index, colony);
+        this._bornAntsInColony(index, colony);
         anyAntsBorn = true;
       }
     });
@@ -367,7 +371,13 @@ class Simulation {
     }
   }
 
-  bornAntsInColony(colonyId, colony) {
+  /**
+   * Creates new ants for a given colony.
+   * @param colonyId {number} the index of th ecolony
+   * @param colony {ColonyStats}
+   * @private
+   */
+  _bornAntsInColony(colonyId, colony) {
     const fixedBirthValue = int(this.config.ants.bornPopulationPercent * colony.numberOfAnts);
     const numOfNewAnts = this.randomIntFromInterval(
       fixedBirthValue / this.config.ants.bornDeviation,
@@ -465,7 +475,11 @@ class Simulation {
     return prettyString;
   }
 
-  cleanup() {
+  /**
+   * Garbage collects no more useful ants (dead) and almost gone pheromones.
+   * @private
+   */
+  _cleanup() {
     let newColonies = [];
     let cleanedAnts = 0;
     for (let colony = 0; colony < this.config.ants.numberOfColonies; colony++) {
