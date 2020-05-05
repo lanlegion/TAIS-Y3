@@ -32,7 +32,11 @@ const ANT_SIM_CONFIG = {
     antsPerColony: 150,
     sightRange: 5,
     maxHealth: 100,
-    bornInterval: 10
+    bornInterval: 10,
+    bornPopulationPercent: 0.02,
+    bornDeviation: 2,
+    averageLifeSpan: 200, // Measured in ticks
+    lifeSpanDeviation: 40 // Measured in ticks
   },
   food: {
     numberOfFoodStacks: 20,

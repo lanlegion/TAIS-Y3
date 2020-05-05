@@ -51,6 +51,16 @@ class Simulation {
     }
   }
 
+  randomIntFromInterval(min, max) { // min and max included
+    return Math.floor(Math.random() * (max - min + 1) + min);
+  }
+
+  _randomAntExpectancy() {
+    return this.randomIntFromInterval(
+      this.config.ants.averageLifeSpan - this.config.ants.lifeSpanDeviation,
+      this.config.ants.averageLifeSpan + this.config.ants.lifeSpanDeviation);
+  }
+
   _initAnts() {
     console.log('Initializing ants');
     this.ants = [];
@@ -71,7 +81,8 @@ class Simulation {
             this.config.ants.maxHealth,
             this.config.food.antHunger,
             this.config.food.starveSpeed,
-            this.config.food.healingSpeed));
+            this.config.food.healingSpeed,
+            this._randomAntExpectancy()));
       }
     }
   }
@@ -220,6 +231,7 @@ class Simulation {
         totalColonyHealth += ant.health;
         ant.move();
         ant.eatFood();
+        ant.aging();
         this.antLeavesPheromone(ant, this.getCell(ant.x, ant.y))
       });
       this.colonies[index].averageHealth = totalColonyHealth / colony.length;
@@ -303,26 +315,38 @@ class Simulation {
     let anyAntsBorn = false;
     this.colonies.forEach((colony, index) => {
       if (colony.food > this.config.food.birthsThreshold && this.tick % this.config.ants.bornInterval === 0) {
-        const initialPosition = this._getInitialPositionForAnt(index);
-        const newborn = new Ant(
-          initialPosition.x,
-          initialPosition.y,
-          index,
-          this,
-          colony,
-          this.config.ants.maxHealth,
-          this.config.food.antHunger,
-          this.config.food.starveSpeed,
-          this.config.food.healingSpeed);
-        this.ants[index].push(newborn);
-        colony.antBorn();
+        this.bornAntsInColony(index, colony);
         anyAntsBorn = true;
       }
     });
-    if(this.config.playSounds && anyAntsBorn) {
+    if (this.config.playSounds && anyAntsBorn) {
       this.uiComponents.audioContainers.born.play().catch(reason => {
         console.error(reason);
       });
+    }
+  }
+
+  bornAntsInColony(colonyId, colony) {
+    const fixedBirthValue = int(this.config.ants.bornPopulationPercent * colony.numberOfAnts);
+    const numOfNewAnts = this.randomIntFromInterval(
+      fixedBirthValue / this.config.ants.bornDeviation,
+      fixedBirthValue * this.config.ants.bornDeviation);
+
+    for (let ant = 0; ant < numOfNewAnts; ant++) {
+      const initialPosition = this._getInitialPositionForAnt(colonyId);
+      const newborn = new Ant(
+        initialPosition.x,
+        initialPosition.y,
+        colonyId,
+        this,
+        colony,
+        this.config.ants.maxHealth,
+        this.config.food.antHunger,
+        this.config.food.starveSpeed,
+        this.config.food.healingSpeed,
+        this._randomAntExpectancy());
+      this.ants[colonyId].push(newborn);
+      colony.antBorn();
     }
   }
 

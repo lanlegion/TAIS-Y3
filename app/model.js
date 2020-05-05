@@ -1,5 +1,5 @@
 class Ant {
-  constructor(x, y, colony, simulation, colonyStats, health = 100, hungerSpeed = 1, starveSpeed = 0.5, healingSpeed) {
+  constructor(x, y, colony, simulation, colonyStats, health, hungerSpeed, starveSpeed, healingSpeed, lifeSpan) {
     this.simulation = simulation;
     this.x = x;
     this.y = y;
@@ -24,6 +24,8 @@ class Ant {
     ];
     this.starveSpeed = starveSpeed;
     this.healingSpeed = healingSpeed;
+    this.lifeSpan = lifeSpan;
+    this.age = 0;
   }
 
   /**
@@ -234,6 +236,18 @@ class Ant {
         this.isDead = true;
         this.colonyStats.antDied();
       }
+    }
+  }
+
+  aging() {
+    if (this.isDead) {
+      return;
+    }
+
+    this.age++;
+    if (this.age >= this.lifeSpan) {
+      this.isDead = true;
+      this.colonyStats.antDied();
     }
   }
 }
