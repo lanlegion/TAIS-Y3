@@ -1,0 +1,74 @@
+Simulation config: {
+  "map": {
+    "drawPheromones": false,
+    "width": 500,
+    "height": 500,
+    "colors": {
+      "colony": [
+        "#f0f64d",
+        "#ffae52",
+        "#c2f3e7",
+        "#ff2020",
+        "#c2367e",
+        "#9933d4",
+        "#000000"
+      ],
+      "foodColor": "#75b8c8",
+      "backgroundColor": "#e6f5f2",
+      "deadAntColor": "#707070",
+      "antWithFood": "#14f43c"
+    },
+    "sizes": {
+      "home": {
+        "x": 15,
+        "y": 15
+      }
+    }
+  },
+  "fps": 60,
+  "gameSpeed": 1,
+  "ants": {
+    "numberOfColonies": 4,
+    "antsPerColony": 350,
+    "sightRange": 5,
+    "maxHealth": 100,
+    "bornInterval": 20,
+    "bornPopulationPercent": 0.01,
+    "bornDeviation": 2,
+    "averageLifeSpan": 2000,
+    "lifeSpanDeviation": 1000,
+    "hitDamage": 20,
+    "hitDeviation": 5,
+    "extraHitPowerFromFood": 0.005,
+    "minimumAntsForCreation": 10
+  },
+  "food": {
+    "numberOfFoodStacks": 35,
+    "foodStackSize": 30,
+    "foodItemValue": 1,
+    "antHunger": 0.005,
+    "birthsThreshold": 0,
+    "starveSpeed": 0.1,
+    "healingSpeed": 0.2
+  },
+  "pheromones": {
+    "foodDecay": 0.64,
+    "homeDecay": 0.64,
+    "existingLimit": 0.05
+  },
+  "probabilities": {
+    "maintainDirectionOnRandom": 0.75,
+    "moveRandomWhileSeeking": 0.2,
+    "minScoreLimit": 0.01,
+    "turnLeftOnRandom": 0.875
+  },
+  "charts": {
+    "lengthThreshold": 100,
+    "aggregationSize": 10,
+    "intervalPush": 10
+  },
+  "debug": true,
+  "drawingTicks": 10,
+  "playSounds": false,
+  "cleanupInterval": 100
+}

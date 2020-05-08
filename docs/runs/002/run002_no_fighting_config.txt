@@ -1,13 +1,13 @@
 const ANT_SIM_CONFIG = {
   map: {
     drawPheromones: false,
-    width: 300, // In pixels
-    height: 300, // In pixels
+    width: 600, // In pixels
+    height: 600, // In pixels
     colors: {
       colony: [
         '#f0f64d',
-        '#ffae52',
-        '#c2f3e7',
+        '#6ae36a',
+        '#37f5c9',
         '#ff2020',
         '#c2367e',
         '#9933d4',
@@ -28,7 +28,7 @@ const ANT_SIM_CONFIG = {
   fps: 60, // Pretty irrelevant
   gameSpeed: 1,
   ants: {
-    numberOfColonies: 4,
+    numberOfColonies: 5,
     antsPerColony: 150,
     sightRange: 5,
     maxHealth: 100,
@@ -37,24 +37,21 @@ const ANT_SIM_CONFIG = {
     bornDeviation: 2,
     averageLifeSpan: 2000, // Measured in ticks
     lifeSpanDeviation: 400, // Measured in ticks
-    hitDamage: 20,
-    hitDeviation: 5,
-    extraHitPowerFromFood: 0.005,
-    minimumAntsForCreation: 10
+    hitDamage: 10
   },
   food: {
-    numberOfFoodStacks: 30,
-    foodStackSize: 20,
+    numberOfFoodStacks: 20,
+    foodStackSize: 100,
     foodItemValue: 1,
-    antHunger: 0.01, // How much food an ant will eat at each tick
+    antHunger: 0.0007,
+    lunchInterval: 10,
     birthsThreshold: 0, // Minimum amount of food that a colony must have to multiply
     starveSpeed: 0.033,
     healingSpeed: 0.2
   },
   pheromones: {
-    foodDecay: 0.94,
-    homeDecay: 0.94,
-    existingLimit: 0.06
+    foodDecay: 0.99,
+    homeDecay: 0.99
   },
   probabilities: {
     maintainDirectionOnRandom: 0.75,
@@ -69,6 +66,5 @@ const ANT_SIM_CONFIG = {
   },
   debug: true,
   drawingTicks: 10,
-  playSounds: false,
-  cleanupInterval: 100
+  playSounds: false
 };

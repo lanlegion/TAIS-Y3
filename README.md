@@ -6,6 +6,10 @@ To change the configurations modify the `config.js` file.
 
 Have fun!
 
+### Preview
+
+![Test run 1](docs/evolution.gif)
+
 ## Sample Tests
 
 You can find the configuration files for these tests in the `runs` folder.
@@ -14,7 +18,7 @@ You can find the configuration files for these tests in the `runs` folder.
 
 No fighting between different colonies.
 
-![Test run 1](runs/run001_no_fighting.png)
+![Test run 1](docs/runs/run001_no_fighting.png)
 
 ---
 
@@ -22,7 +26,7 @@ No fighting between different colonies.
 
 No fighting between different colonies.
 
-![Test run 2](runs/run002_1770ticks_no_fighting.png)
+![Test run 2](docs/runs/run002_1770ticks_no_fighting.png)
 
 ---
 
@@ -30,4 +34,4 @@ No fighting between different colonies.
 
 Fighting involved between different colonies.
 
-![Test run 3](runs/run003.png)
+![Test run 3](docs/runs/run003.png)
