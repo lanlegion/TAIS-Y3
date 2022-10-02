@@ -419,17 +419,18 @@ class Simulation {
     background(this.config.map.colors.backgroundColor);
     noStroke();
 
+    // TODO different colours per pheromone
     if (this.config.map.drawPheromones) {
       fill('rgba(236,142,142,0.48)');
       this.pheromoneCells.forEach(cell => {
-        rect(cell.x, cell.y, 1, 1);
+        rect(cell.x*this.config.map.drawScale, cell.y*this.config.map.drawScale, 1*this.config.map.drawScale, 1*this.config.map.drawScale);
       })
     }
 
     this.homes.forEach((cells, index) => {
       fill(this.colonyColors[index]);
       cells.forEach(cell => {
-        rect(cell.x, cell.y, 1, 1);
+        rect(cell.x*this.config.map.drawScale, cell.y*this.config.map.drawScale, 1*this.config.map.drawScale, 1*this.config.map.drawScale);
       });
     });
 
@@ -442,13 +443,13 @@ class Simulation {
           antColor = this.config.map.colors.antWithFood;
         }
         fill(antColor);
-        rect(ant.x, ant.y, 1, 1);
+        rect(ant.x*this.config.map.drawScale, ant.y*this.config.map.drawScale, 1*this.config.map.drawScale, 1*this.config.map.drawScale);
       })
     });
 
     fill(this.config.map.colors.foodColor);
     this.foods.forEach(foodCell => {
-      rect(foodCell.x, foodCell.y, 1, 1);
+      rect(foodCell.x*this.config.map.drawScale, foodCell.y*this.config.map.drawScale, 1*this.config.map.drawScale, 1*this.config.map.drawScale);
     });
   }
 

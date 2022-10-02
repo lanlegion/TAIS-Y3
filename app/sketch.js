@@ -13,7 +13,7 @@ function switchDrawing() {
 }
 
 function setup() {
-  createCanvas(ANT_SIM_CONFIG.map.width, ANT_SIM_CONFIG.map.height);
+  createCanvas(ANT_SIM_CONFIG.map.width*ANT_SIM_CONFIG.map.drawScale, ANT_SIM_CONFIG.map.height*ANT_SIM_CONFIG.map.drawScale);
   frameRate(ANT_SIM_CONFIG.fps);
 
   const audioContainers = {
