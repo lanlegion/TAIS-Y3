@@ -1,6 +1,7 @@
 const ANT_SIM_CONFIG = {
   map: {
-    drawPheromones: false,
+    drawPheromones: true,
+    drawScale: 5, // scale drawing
     width: 300, // In pixels
     height: 300, // In pixels
     colors: {
@@ -28,7 +29,7 @@ const ANT_SIM_CONFIG = {
   fps: 60, // Pretty irrelevant
   gameSpeed: 1,
   ants: {
-    numberOfColonies: 4,
+    numberOfColonies: 1,
     antsPerColony: 150,
     sightRange: 5,
     maxHealth: 100,
@@ -54,7 +55,9 @@ const ANT_SIM_CONFIG = {
   pheromones: {
     foodDecay: 0.94,
     homeDecay: 0.94,
-    existingLimit: 0.06
+    dangerDecay: 0.94, // added danger decay
+    existingLimit: 0.06,
+    useDanger: false // added danger switch
   },
   probabilities: {
     maintainDirectionOnRandom: 0.75,

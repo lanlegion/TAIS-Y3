@@ -61,7 +61,7 @@ class Ant {
       this.carryingFood = true;
       this.simulation.clearFood(forwardCell);
       this.turnAround();
-    }
+    } 
 
     this.seek(!this.carryingFood);
   }
@@ -212,7 +212,9 @@ class Ant {
         if (cell.type === CellType.FOOD) {
           return 100;
         } else {
-          return cell.getFoodPheromone(this.colony);
+          // Danger pheromone when looking for food for now TODO
+          return cell.getFoodPheromone(this.colony) 
+          - cell.getDangerPheromone(this.colony);
         }
       } else {
         if (cell.type === CellType.HOME) {
@@ -285,6 +287,8 @@ class Pheromones {
   constructor() {
     this.food = {};
     this.home = {};
+    this.danger = {};
+    this.useDanger = ANT_SIM_CONFIG.pheromones.useDanger;
     this.existingLimit = ANT_SIM_CONFIG.pheromones.existingLimit;
   }
 
@@ -303,6 +307,12 @@ class Pheromones {
         return true;
       }
     }
+    // extra pheromone
+    for (let dangerKey in this.danger) {
+      if (this.danger[dangerKey] > this.existingLimit) {
+        return true;
+      }
+    }
     return false;
   }
 
@@ -310,6 +320,7 @@ class Pheromones {
    * Removes the almost empty pheromones.
    * @return {{food: number, home: number}} - the number of food and home pheromones which were cleaned.
    */
+  // TODO add danger pheromone?
   clean() {
     let homeCleanedPerColony = 0;
     let foodCleanedPerColony = 0;
@@ -371,10 +382,19 @@ class Cell {
     this.pheromones.home[colony] += value;
   }
 
+  // TODO new danger pheromone
+  addDangerPheromone(value, colony) {
+    if (!this.pheromones.danger[colony]) {
+      this.pheromones.danger[colony] = 0.0;
+    }
+    this.pheromones.danger[colony] += value;
+  }
+
   /**
    * Decays (decreases) the pheromone levels.
    * @param foodDecay {number} the decay for food pheromones.
    * @param homeDecay {number} the decay for home pheromones.
+   * @param dangerDecay {number} the decay for danger pheromones. (added)
    */
   decayPheromones(foodDecay, homeDecay) {
     for (let key in this.pheromones.food) {
@@ -382,6 +402,9 @@ class Cell {
     }
     for (let key in this.pheromones.home) {
       this.pheromones.home[key] *= homeDecay;
+    } 
+    for (let key in this.pheromones.danger) {
+      this.pheromones.danger[key] *= dangerDecay;
     }
   }
 
@@ -405,6 +428,15 @@ class Cell {
    */
   getHomePheromone(colony) {
     const pheromone = this.pheromones.home[colony];
+    if (pheromone === undefined) {
+      return 0;
+    }
+    return pheromone;
+  }
+
+  // TODO new danger pheromone
+  getDangerPheromone(colony) {
+    const pheromone = this.pheromones.danger[colony];
     if (pheromone === undefined) {
       return 0;
     }
