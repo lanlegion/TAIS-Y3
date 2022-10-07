@@ -12,19 +12,19 @@ const ANT_SIM_CONFIG = {
         '#ff2020',
         '#c2367e',
         '#9933d4',
-        '#000000'
+        '#000000',
       ],
       foodColor: '#75b8c8',
       backgroundColor: '#e6f5f2',
       deadAntColor: '#707070',
-      antWithFood: '#14f43c'
+      antWithFood: '#14f43c',
     },
     sizes: {
       home: {
         x: 15,
-        y: 15
-      }
-    }
+        y: 15,
+      },
+    },
   },
   fps: 60, // Pretty irrelevant
   gameSpeed: 1,
@@ -36,12 +36,12 @@ const ANT_SIM_CONFIG = {
     bornInterval: 10, // Measured in ticks
     bornPopulationPercent: 0.02,
     bornDeviation: 2,
-    averageLifeSpan: 2000, // Measured in ticks
+    averageLifeSpan: 400, // Measured in ticks, default: 2000, testing: 400
     lifeSpanDeviation: 400, // Measured in ticks
     hitDamage: 20,
     hitDeviation: 5,
     extraHitPowerFromFood: 0.005,
-    minimumAntsForCreation: 10
+    minimumAntsForCreation: 10,
   },
   food: {
     numberOfFoodStacks: 30,
@@ -50,20 +50,20 @@ const ANT_SIM_CONFIG = {
     antHunger: 0.01, // How much food an ant will eat at each tick
     birthsThreshold: 0, // Minimum amount of food that a colony must have to multiply
     starveSpeed: 0.033,
-    healingSpeed: 0.2
+    healingSpeed: 0.2,
   },
   pheromones: {
     foodDecay: 0.94,
     homeDecay: 0.94,
     dangerDecay: 0.94, // added danger decay
     existingLimit: 0.06,
-    useDanger: false // added danger switch
+    useDanger: true, // added danger switch
   },
   probabilities: {
     maintainDirectionOnRandom: 0.75,
     moveRandomWhileSeeking: 0.2,
     minScoreLimit: 0.01,
-    turnLeftOnRandom: 0.875
+    turnLeftOnRandom: 0.875,
   },
   charts: {
     lengthThreshold: 100,
@@ -73,5 +73,5 @@ const ANT_SIM_CONFIG = {
   debug: true,
   drawingTicks: 10,
   playSounds: false,
-  cleanupInterval: 100
-};
+  cleanupInterval: 100,
+}
