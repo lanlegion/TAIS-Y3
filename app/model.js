@@ -212,7 +212,7 @@ class Ant {
         if (cell.type === CellType.FOOD) {
           return 100;
         } else {
-          // Danger pheromone when looking for food for now TODO
+          // Avoid danger pheromone when looking for food for now TODO?
           return cell.getFoodPheromone(this.colony) 
           - cell.getDangerPheromone(this.colony);
         }

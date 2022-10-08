@@ -347,8 +347,10 @@ class Simulation {
       }
       this.pheromoneCells.add(currentCell)
     }
-    // danger pheromone
-    if (currentCell !== null && ant.isDead) {
+    // danger pheromone, left in the cell when the ant dies
+    // and isn't holding food
+    // TODO: hasn't picked up food during its lifetime?
+    if (this.config.pheromones.useDanger && currentCell !== null && ant.isDead && !ant.carryingFood) {
       currentCell.addDangerPheromone(quantity, ant.colony)
       this.pheromoneCells.add(currentCell) // TODO refactor?
       this.pheroDangerCells.add(currentCell)

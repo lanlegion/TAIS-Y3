@@ -36,7 +36,7 @@ const ANT_SIM_CONFIG = {
     bornInterval: 10, // Measured in ticks
     bornPopulationPercent: 0.02,
     bornDeviation: 2,
-    averageLifeSpan: 400, // Measured in ticks, default: 2000, testing: 400
+    averageLifeSpan: 500, // Measured in ticks, old: 2000, new: 500
     lifeSpanDeviation: 400, // Measured in ticks
     hitDamage: 20,
     hitDeviation: 5,
