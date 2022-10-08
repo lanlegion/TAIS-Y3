@@ -53,7 +53,12 @@ class Ant {
       });
     }
 
-    if (this.carryingFood && forwardCell.type === CellType.HOME) {
+    // Obstacle (wall)
+    if (forwardCell.type == CellType.WALL)
+    {
+      this.turnAround();
+    }
+    else if (this.carryingFood && forwardCell.type === CellType.HOME) {
       this.carryingFood = false;
       this.simulation.storeFood(this.colony, this.carryingCapacity);
       this.turnAround();
@@ -61,7 +66,7 @@ class Ant {
       this.carryingFood = true;
       this.simulation.clearFood(forwardCell);
       this.turnAround();
-    } 
+    }
 
     this.seek(!this.carryingFood);
   }

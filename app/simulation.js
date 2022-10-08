@@ -13,12 +13,13 @@ class Simulation {
 
     this.tick = 0;
 
-    let occupiedCells = new Set();
-    this._initCells();
-    this._initHomes(occupiedCells);
-    this._initAnts();
-    this._initColoniesColors();
-    this._initFoodStacks(occupiedCells);
+    let occupiedCells = new Set()
+    this._initCells()
+    this._initWalls(occupiedCells) // added obstacles
+    this._initHomes(occupiedCells)
+    this._initAnts()
+    this._initColoniesColors()
+    this._initFoodStacks(occupiedCells)
 
     console.log('Simulation initialization complete!');
   }
@@ -124,6 +125,27 @@ class Simulation {
         }
       }
     }
+  }
+
+  // Added obstacles
+  _initWalls(occupiedCells) {
+    console.log('Initializing walls/obstacles')
+    console.log(this.config.map.width/2)
+    this.walls = []
+    for (let x = 0; x < this.config.map.width/2; x++)
+      for (let y = 0; y < 10; y++)
+      {
+        const posX = this.config.map.width/4 + x 
+        const posY = this.config.map.height/2 + y
+        if (occupiedCells.has(`${posX}-${posY}`)) { // TODO NOTE: doesn't this cause a lack of food stacks?
+          continue
+        }
+        occupiedCells.add(`${posX}-${posY}`)
+        const currentCell = this.cells[posX][posY]
+        currentCell.type = CellType.WALL 
+        this.walls.push(currentCell) // TODO refactor
+      }
+    console.log('walls', this.walls)
   }
 
   /**
@@ -419,20 +441,29 @@ class Simulation {
     background(this.config.map.colors.backgroundColor);
     noStroke();
 
+    function drawCell(cell, drawScale) {
+      rect(cell.x*drawScale, cell.y*drawScale, 1*drawScale, 1*drawScale);
+    }
+
     // TODO different colours per pheromone
     if (this.config.map.drawPheromones) {
       fill('rgba(236,142,142,0.48)');
       this.pheromoneCells.forEach(cell => {
-        rect(cell.x*this.config.map.drawScale, cell.y*this.config.map.drawScale, 1*this.config.map.drawScale, 1*this.config.map.drawScale);
+        drawCell(cell, this.config.map.drawScale)
       })
     }
 
     this.homes.forEach((cells, index) => {
-      fill(this.colonyColors[index]);
-      cells.forEach(cell => {
-        rect(cell.x*this.config.map.drawScale, cell.y*this.config.map.drawScale, 1*this.config.map.drawScale, 1*this.config.map.drawScale);
-      });
-    });
+      fill(this.colonyColors[index])
+      cells.forEach((cell) => {
+        drawCell(cell, this.config.map.drawScale)
+      })
+    })
+
+    this.walls.forEach((cell) => {
+      fill('rgba(50,50,50,0.9)')
+        drawCell(cell, this.config.map.drawScale)
+    })
 
     this.ants.forEach((colony, index) => {
       colony.forEach((ant) => {
@@ -442,15 +473,15 @@ class Simulation {
         } else if (ant.carryingFood) {
           antColor = this.config.map.colors.antWithFood;
         }
-        fill(antColor);
-        rect(ant.x*this.config.map.drawScale, ant.y*this.config.map.drawScale, 1*this.config.map.drawScale, 1*this.config.map.drawScale);
+        fill(antColor)
+        drawCell(ant, this.config.map.drawScale)
       })
-    });
+    })
 
-    fill(this.config.map.colors.foodColor);
-    this.foods.forEach(foodCell => {
-      rect(foodCell.x*this.config.map.drawScale, foodCell.y*this.config.map.drawScale, 1*this.config.map.drawScale, 1*this.config.map.drawScale);
-    });
+    fill(this.config.map.colors.foodColor)
+    this.foods.forEach((foodCell) => {
+      drawCell(foodCell, this.config.map.drawScale)
+    })
   }
 
   statsHtmlString() {
