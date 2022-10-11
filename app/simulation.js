@@ -370,6 +370,9 @@ class Simulation {
     }
   }
 
+  // Added pheromone diffusion
+  _diffusePheromone() {}
+
   /**
    * Decay the pheromones over time.
    */
@@ -378,7 +381,8 @@ class Simulation {
     for (let cell in this.pheromoneCells) {
       cell.decayPheromones(
         this.config.pheromones.foodDecay,
-        this.config.pheromoneCells.homeDecay
+        this.config.pheromones.homeDecay,
+        this.config.pheromones.dangerDecay
       )
       if (!cell.hasAnyPheromones()) {
         cellsToDelete.push(cell)

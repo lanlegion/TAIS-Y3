@@ -427,7 +427,7 @@ class Cell {
    * @param homeDecay {number} the decay for home pheromones.
    * @param dangerDecay {number} the decay for danger pheromones. (added)
    */
-  decayPheromones(foodDecay, homeDecay) {
+  decayPheromones(foodDecay, homeDecay, dangerDecay) {
     for (let key in this.pheromones.food) {
       this.pheromones.food[key] *= foodDecay
     }

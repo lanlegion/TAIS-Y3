@@ -53,6 +53,7 @@ const ANT_SIM_CONFIG = {
     healingSpeed: 0.2,
   },
   pheromones: {
+    diffusion: 0.01,
     foodDecay: 0.94,
     homeDecay: 0.94,
     dangerDecay: 0.94, // added danger decay
