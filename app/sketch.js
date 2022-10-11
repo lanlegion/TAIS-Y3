@@ -1,26 +1,43 @@
-let simulation;
-let isRunning = true;
-let isDrawing = true;
+let simulation
+let isRunning = true
+let isDrawing = true
 
 // Switches on and off the simulation
 function switchRunning() {
-  isRunning = !isRunning;
+  isRunning = !isRunning
 }
 
 // Switches on and off the map rendering and charts live updates
 function switchDrawing() {
-  isDrawing = !isDrawing;
+  isDrawing = !isDrawing
 }
 
 function setup() {
-  createCanvas(ANT_SIM_CONFIG.map.width*ANT_SIM_CONFIG.map.drawScale, ANT_SIM_CONFIG.map.height*ANT_SIM_CONFIG.map.drawScale);
-  frameRate(ANT_SIM_CONFIG.fps);
+  createCanvas(
+    ANT_SIM_CONFIG.map.width * ANT_SIM_CONFIG.map.drawScale,
+    ANT_SIM_CONFIG.map.height * ANT_SIM_CONFIG.map.drawScale
+  )
+  frameRate(ANT_SIM_CONFIG.fps)
 
   const audioContainers = {
-    born: document.getElementById('audio_container_born')
-  };
+    born: document.getElementById('audio_container_born'),
+  }
 
-  const uiComponents = new UiComponents(select('#stats_div'), select('#debug_div'), audioContainers);
+  const uiComponents = new UiComponents(
+    select('#stats_div'),
+    select('#debug_div'),
+    audioContainers
+  )
+
+  // Added total food chart
+  const totalFoodChart = new AntsChart(
+    ANT_SIM_CONFIG.ants.numberOfColonies,
+    ANT_SIM_CONFIG.map.colors.colony,
+    'total_food_chart',
+    'Total food',
+    ANT_SIM_CONFIG.charts.lengthThreshold,
+    ANT_SIM_CONFIG.charts.aggregationSize
+  )
 
   const foodChart = new AntsChart(
     ANT_SIM_CONFIG.ants.numberOfColonies,
@@ -28,7 +45,8 @@ function setup() {
     'food_chart',
     'Food',
     ANT_SIM_CONFIG.charts.lengthThreshold,
-    ANT_SIM_CONFIG.charts.aggregationSize);
+    ANT_SIM_CONFIG.charts.aggregationSize
+  )
 
   const healthChart = new AntsChart(
     ANT_SIM_CONFIG.ants.numberOfColonies,
@@ -36,7 +54,8 @@ function setup() {
     'health_chart',
     'Health',
     ANT_SIM_CONFIG.charts.lengthThreshold,
-    ANT_SIM_CONFIG.charts.aggregationSize);
+    ANT_SIM_CONFIG.charts.aggregationSize
+  )
 
   const populationChart = new AntsChart(
     ANT_SIM_CONFIG.ants.numberOfColonies,
@@ -44,7 +63,8 @@ function setup() {
     'population_chart',
     'Population',
     ANT_SIM_CONFIG.charts.lengthThreshold,
-    ANT_SIM_CONFIG.charts.aggregationSize);
+    ANT_SIM_CONFIG.charts.aggregationSize
+  )
 
   const deadChart = new AntsChart(
     ANT_SIM_CONFIG.ants.numberOfColonies,
@@ -52,7 +72,8 @@ function setup() {
     'dead_chart',
     'Dead ants',
     ANT_SIM_CONFIG.charts.lengthThreshold,
-    ANT_SIM_CONFIG.charts.aggregationSize);
+    ANT_SIM_CONFIG.charts.aggregationSize
+  )
 
   const ageChart = new AntsChart(
     ANT_SIM_CONFIG.ants.numberOfColonies,
@@ -60,22 +81,24 @@ function setup() {
     'age_chart',
     'Average age',
     ANT_SIM_CONFIG.charts.lengthThreshold,
-    ANT_SIM_CONFIG.charts.aggregationSize);
+    ANT_SIM_CONFIG.charts.aggregationSize
+  )
 
   const charts = {
+    totalFoodChart: totalFoodChart,
     foodChart: foodChart,
     healthChart: healthChart,
     populationChart: populationChart,
     deadChart: deadChart,
-    ageChart: ageChart
+    ageChart: ageChart,
   }
 
-  simulation = new Simulation(ANT_SIM_CONFIG, uiComponents, charts);
+  simulation = new Simulation(ANT_SIM_CONFIG, uiComponents, charts)
 }
 
 function draw() {
   if (isRunning) {
-    simulation.run(isDrawing);
-    simulation.draw(isDrawing);
+    simulation.run(isDrawing)
+    simulation.draw(isDrawing)
   }
 }
