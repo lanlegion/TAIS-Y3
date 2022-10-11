@@ -297,6 +297,7 @@ class Simulation {
       return
     }
 
+    let totalFoodCurrentStats = []
     let foodCurrentStats = []
     let healthCurrentStats = []
     let populationCurrentStats = []
@@ -305,12 +306,14 @@ class Simulation {
 
     for (let colony = 0; colony < this.colonies.length; colony++) {
       if (this.colonies[colony].numberOfAnts === 0) {
+        totalFoodCurrentStats.push(null)
         foodCurrentStats.push(null)
         healthCurrentStats.push(null)
         populationCurrentStats.push(null)
         deadCurrentStats.push(null)
         averageAge.push(null)
       } else {
+        totalFoodCurrentStats.push(this.colonies[colony].totalFood)
         foodCurrentStats.push(this.colonies[colony].food)
         healthCurrentStats.push(this.colonies[colony].averageHealth)
         populationCurrentStats.push(this.colonies[colony].numberOfAnts)
@@ -319,6 +322,11 @@ class Simulation {
       }
     }
 
+    this.charts.totalFoodChart.pushData(
+      totalFoodCurrentStats,
+      this.tick,
+      isDrawing
+    )
     this.charts.foodChart.pushData(foodCurrentStats, this.tick, isDrawing)
     this.charts.healthChart.pushData(healthCurrentStats, this.tick, isDrawing)
     this.charts.populationChart.pushData(
@@ -350,7 +358,12 @@ class Simulation {
     // danger pheromone, left in the cell when the ant dies
     // and isn't holding food
     // TODO: hasn't picked up food during its lifetime?
-    if (this.config.pheromones.useDanger && currentCell !== null && ant.isDead && !ant.carryingFood) {
+    if (
+      this.config.pheromones.useDanger &&
+      currentCell !== null &&
+      ant.isDead &&
+      !ant.carryingFood
+    ) {
       currentCell.addDangerPheromone(quantity, ant.colony)
       this.pheromoneCells.add(currentCell) // TODO refactor?
       this.pheroDangerCells.add(currentCell)
