@@ -330,6 +330,7 @@ class Pheromones {
   hasAnyPheromones() {
     for (let foodKey in this.food) {
       if (this.food[foodKey] > this.existingLimit) {
+        console.log('yes pheromones')
         return true
       }
     }
@@ -344,6 +345,7 @@ class Pheromones {
         return true
       }
     }
+    console.log('no pheromones')
     return false
   }
 
@@ -351,10 +353,10 @@ class Pheromones {
    * Removes the almost empty pheromones.
    * @return {{food: number, home: number}} - the number of food and home pheromones which were cleaned.
    */
-  // TODO add danger pheromone?
   clean() {
     let homeCleanedPerColony = 0
     let foodCleanedPerColony = 0
+    let dangerCleanedPerColony = 0
     for (let foodKey in this.food) {
       if (this.food[foodKey] <= this.existingLimit) {
         delete this.food[foodKey]
@@ -367,9 +369,17 @@ class Pheromones {
         homeCleanedPerColony++
       }
     }
+    // added danger pheromone
+    for (let dangerKey in this.danger) {
+      if (this.home[dangerKey] <= this.existingLimit) {
+        delete this.home[dangerKey]
+        homeCleanedPerColony++
+      }
+    }
     return {
       food: foodCleanedPerColony,
       home: homeCleanedPerColony,
+      danger: dangerCleanedPerColony,
     }
   }
 }

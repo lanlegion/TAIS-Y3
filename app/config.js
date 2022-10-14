@@ -1,7 +1,7 @@
 const ANT_SIM_CONFIG = {
   map: {
     drawPheromones: true,
-    drawScale: 5, // scale drawing
+    drawScale: 3, // scale drawing
     width: 300, // In pixels
     height: 300, // In pixels
     colors: {
@@ -53,11 +53,12 @@ const ANT_SIM_CONFIG = {
     healingSpeed: 0.2,
   },
   pheromones: {
+    useDiffusion: true,
     diffusion: 0.01,
     foodDecay: 0.94,
     homeDecay: 0.94,
     dangerDecay: 0.94, // added danger decay
-    existingLimit: 0.06,
+    existingLimit: 50, //0.06,
     useDanger: true, // added danger switch
   },
   probabilities: {

@@ -279,6 +279,9 @@ class Simulation {
       this.colonies[index].averageAge = totalColonyAge / numberOfAliveAnts
     })
     this.antsOnMap = newAntsOnMap
+    if (this.config.pheromones.useDiffusion) {
+      this._diffusePheromones(this.ants[0]) // refactor
+    }
     this._decayPheromone()
     this._consumeFood()
     this._bornAnts()
@@ -371,7 +374,19 @@ class Simulation {
   }
 
   // Added pheromone diffusion
-  _diffusePheromone() {}
+  _diffusePheromones(directions) {
+    console.log('test')
+    for (let cell in this.pheromoneCells) {
+      for (let direction in directions) {
+        const currentCell = this.getCell(
+          cell.x + direction.x,
+          cell.y + direction.y
+        )
+        currentCell.pheromones = cell.pheromones
+        console.log('diffusion', currentCell.pheromones)
+      }
+    }
+  }
 
   /**
    * Decay the pheromones over time.
@@ -394,6 +409,7 @@ class Simulation {
       this.pheroFoodCells.delete(cell)
       this.pheroHomeCells.delete(cell)
       this.pheroDangerCells.delete(cell)
+      console.log('deleted cell!')
     })
   }
 
@@ -483,15 +499,20 @@ class Simulation {
 
     // TODO refactor
     if (this.config.map.drawPheromones) {
-      fill('rgba(50,255,50,0.9)') // green = food phero
+      fill('rgba(50,255,255,0.5)') // cyan = food phero
       this.pheroFoodCells.forEach((cell) => {
+        // TODO alpha based on pheromone concentration?
+        // TODO NOTE: only works for one colony
+        //const alpha = cell.pheromones.food[0]
+        //fill('rgba(50,255,50,' + alpha + ')') // green = food phero
+        console.log(cell.pheromones.food)
         drawCell(cell, this.config.map.drawScale)
       })
-      fill('rgba(50,50,255,0.9)') // blue = home phero
+      fill('rgba(255,70,220,0.5)') // magenta = home phero
       this.pheroHomeCells.forEach((cell) => {
         drawCell(cell, this.config.map.drawScale)
       })
-      fill('rgba(255,50,50,0.9)') // red = danger phero
+      fill('rgba(255,50,50,0.5)') // red = danger phero
       this.pheroDangerCells.forEach((cell) => {
         drawCell(cell, this.config.map.drawScale)
       })
