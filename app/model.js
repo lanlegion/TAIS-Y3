@@ -335,7 +335,6 @@ class Pheromones {
   hasAnyPheromones() {
     for (let foodKey in this.food) {
       if (this.food[foodKey] > this.existingLimit) {
-        console.log('yes pheromones')
         return true
       }
     }
@@ -350,7 +349,7 @@ class Pheromones {
         return true
       }
     }
-    console.log('no pheromones')
+    //console.log('no pheromones')
     return false
   }
 
@@ -520,6 +519,8 @@ class ColonyStats {
     this.numberOfDeadAnts = 0
     this.food = 0
     this.totalFood = 0
+    this.foodPheromones = 0
+    this.homePheromones = 0
   }
 
   /**
@@ -529,6 +530,7 @@ class ColonyStats {
   storeFood(quantity = 1) {
     this.food += quantity
     this.totalFood += quantity
+    //console.log('total food', this.totalFood)
   }
 
   /**

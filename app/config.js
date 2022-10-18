@@ -1,12 +1,13 @@
 const ANT_SIM_CONFIG = {
   map: {
+    obstacles: false,
     drawPheromones: true,
     drawScale: 3, // scale drawing
     width: 300, // In pixels
     height: 300, // In pixels
     colors: {
       colony: [
-        '#f0f64d',
+        '#3A948F',
         '#ffae52',
         '#c2f3e7',
         '#ff2020',
@@ -15,7 +16,7 @@ const ANT_SIM_CONFIG = {
         '#000000',
       ],
       foodColor: '#75b8c8',
-      backgroundColor: '#e6f5f2',
+      backgroundColor: '#969E9E',//'#e6f5f2',
       deadAntColor: '#707070',
       antWithFood: '#14f43c',
     },
@@ -47,9 +48,9 @@ const ANT_SIM_CONFIG = {
     numberOfFoodStacks: 30,
     foodStackSize: 20,
     foodItemValue: 1,
-    antHunger: 0.01, // How much food an ant will eat at each tick
+    antHunger: 0, // How much food an ant will eat at each tick
     birthsThreshold: 0, // Minimum amount of food that a colony must have to multiply
-    starveSpeed: 0.033,
+    starveSpeed: 0,
     healingSpeed: 0.2,
   },
   pheromones: {
@@ -58,7 +59,7 @@ const ANT_SIM_CONFIG = {
     foodDecay: 0.94,
     homeDecay: 0.94,
     dangerDecay: 0.94, // added danger decay
-    existingLimit: 50, //0.06,
+    existingLimit: 0.06,
     useDanger: true, // added danger switch
   },
   probabilities: {

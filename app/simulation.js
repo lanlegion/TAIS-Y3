@@ -15,7 +15,7 @@ class Simulation {
 
     let occupiedCells = new Set()
     this._initCells()
-    this._initWalls(occupiedCells) // added obstacles
+    if (this.config.map.obstacles) this._initWalls(occupiedCells) // added obstacles
     this._initHomes(occupiedCells)
     this._initAnts()
     this._initColoniesColors()
@@ -312,6 +312,7 @@ class Simulation {
       this._cleanup()
     }
   }
+  
 
   /**
    * Adds the data from this tick of the simulation to the charts.
@@ -322,6 +323,9 @@ class Simulation {
       return
     }
 
+    // TODO refactor
+    let foodPheromoneStats = []
+    let homePheromoneStats = []
     let totalFoodCurrentStats = []
     let foodCurrentStats = []
     let healthCurrentStats = []
@@ -331,6 +335,7 @@ class Simulation {
 
     for (let colony = 0; colony < this.colonies.length; colony++) {
       if (this.colonies[colony].numberOfAnts === 0) {
+        // TODO refactor
         totalFoodCurrentStats.push(null)
         foodCurrentStats.push(null)
         healthCurrentStats.push(null)
@@ -338,6 +343,7 @@ class Simulation {
         deadCurrentStats.push(null)
         averageAge.push(null)
       } else {
+        console.log('total food',this.colonies[colony].totalFood)
         totalFoodCurrentStats.push(this.colonies[colony].totalFood)
         foodCurrentStats.push(this.colonies[colony].food)
         healthCurrentStats.push(this.colonies[colony].averageHealth)
@@ -346,9 +352,47 @@ class Simulation {
         averageAge.push(this.colonies[colony].averageAge)
       }
     }
+    // Update pheromone charts data
+    // NOTE only works for one colony
+    
+   function sumPheromones(cells, key) // TODO refactor: iterate over cells instead?
+  {
+    /*return Object.entries(cells).reduce((a,b)=>{
+      a.pheromones[key][0] + b.pheromones[key][0]},0)*/
+      let sum = 0
+      for (const cell of cells)
+      {
+        //if (cell.pheromones)
+        const pheroAmount = cell.pheromones[key][0]
+        if (!pheroAmount) 
+        {
+          sum+=0
+          //console.log('YOOO', cell.pheromones)  // TODO this is odd? should this be null?
+        }
+        else 
+        {
+          sum += pheroAmount
+      }
+    }
+      return sum
+  }
+    //console.log('phero food cells', this.pheroFoodCells)
+    const foodPheromones = sumPheromones(this.pheroFoodCells, 'food')
+    //const foodPheromones = sumPheromones(this.cells, 'food')
+    //console.log('foodpheros',foodPheromones)
+    foodPheromoneStats.push(foodPheromones)
+    const homePheromones = sumPheromones(this.pheroHomeCells, 'home')
+    //console.log('homepheros',homePheromones)
+    homePheromoneStats.push(homePheromones)
 
-    this.charts.totalFoodChart.pushData(
-      totalFoodCurrentStats,
+    // Push to charts
+    this.charts.foodPheromones.pushData(
+      foodPheromoneStats,
+      this.tick,
+      isDrawing
+    )
+    this.charts.homePheromones.pushData(
+      homePheromoneStats,
       this.tick,
       isDrawing
     )
@@ -397,7 +441,7 @@ class Simulation {
 
   // Added pheromone diffusion
   _diffusePheromones(directions) {
-    console.log('test')
+    //console.log('test')
     for (let cell in this.pheromoneCells) {
       for (let direction in directions) {
         const currentCell = this.getCell(
@@ -415,7 +459,9 @@ class Simulation {
    */
   _decayPheromone() {
     let cellsToDelete = []
-    for (let cell in this.pheromoneCells) {
+    
+    //console.log(this.pheromoneCells)
+    for (let cell of this.pheromoneCells) {
       cell.decayPheromones(
         this.config.pheromones.foodDecay,
         this.config.pheromones.homeDecay,
@@ -431,7 +477,6 @@ class Simulation {
       this.pheroFoodCells.delete(cell)
       this.pheroHomeCells.delete(cell)
       this.pheroDangerCells.delete(cell)
-      console.log('deleted cell!')
     })
   }
 
@@ -521,17 +566,22 @@ class Simulation {
 
     // TODO refactor
     if (this.config.map.drawPheromones) {
-      fill('rgba(50,255,255,0.5)') // cyan = food phero
+      const alphaScale = 1
+      //fill('rgba(50,255,255,0.5)') // cyan = food phero
       this.pheroFoodCells.forEach((cell) => {
         // TODO alpha based on pheromone concentration?
         // TODO NOTE: only works for one colony
-        //const alpha = cell.pheromones.food[0]
-        //fill('rgba(50,255,50,' + alpha + ')') // green = food phero
-        console.log(cell.pheromones.food)
+        const alpha = cell.pheromones.food[0]/alphaScale
+        //console.log(cell.pheromones.food,'-',alpha)
+        fill('rgba(50,255,255,' + alpha + ')') // green = food phero
+        //console.log(cell.pheromones.food)
         drawCell(cell, this.config.map.drawScale)
       })
-      fill('rgba(255,70,220,0.5)') // magenta = home phero
+      //fill('rgba(255,70,220,0.5)') // magenta = home phero
       this.pheroHomeCells.forEach((cell) => {
+        const alpha = cell.pheromones.home[0]/alphaScale
+        //console.log(alpha)
+        fill('rgba(255,70,220,' + alpha + ')') 
         drawCell(cell, this.config.map.drawScale)
       })
       fill('rgba(255,50,50,0.5)') // red = danger phero
@@ -551,10 +601,12 @@ class Simulation {
       })
     })
 
+    if (this.config.map.obstacles) {
     this.walls.forEach((cell) => {
       fill('rgba(50,50,50,0.9)')
         drawCell(cell, this.config.map.drawScale)
     })
+  }
 
     this.ants.forEach((colony, index) => {
       colony.forEach((ant) => {

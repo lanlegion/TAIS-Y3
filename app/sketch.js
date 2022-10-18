@@ -13,10 +13,11 @@ function switchDrawing() {
 }
 
 function setup() {
-  createCanvas(
+  let renderer =createCanvas(
     ANT_SIM_CONFIG.map.width * ANT_SIM_CONFIG.map.drawScale,
     ANT_SIM_CONFIG.map.height * ANT_SIM_CONFIG.map.drawScale
   )
+  renderer.parent("map");
   frameRate(ANT_SIM_CONFIG.fps)
 
   const audioContainers = {
@@ -28,16 +29,35 @@ function setup() {
     select('#debug_div'),
     audioContainers
   )
+  
+  // Added pheromone charts
+  const foodPheromoneChart = new AntsChart(
+    ANT_SIM_CONFIG.ants.numberOfColonies,
+    ANT_SIM_CONFIG.map.colors.colony,
+    'food_phero_chart',
+    'Food pheromone',
+    ANT_SIM_CONFIG.charts.lengthThreshold,
+    ANT_SIM_CONFIG.charts.aggregationSize
+  )
+  
+  const homePheromoneChart = new AntsChart(
+    ANT_SIM_CONFIG.ants.numberOfColonies,
+    ANT_SIM_CONFIG.map.colors.colony,
+    'home_phero_chart',
+    'Home pheromone',
+    ANT_SIM_CONFIG.charts.lengthThreshold,
+    ANT_SIM_CONFIG.charts.aggregationSize
+  )
 
   // Added total food chart
-  const totalFoodChart = new AntsChart(
+  /*const totalFoodChart = new AntsChart(
     ANT_SIM_CONFIG.ants.numberOfColonies,
     ANT_SIM_CONFIG.map.colors.colony,
     'total_food_chart',
     'Total food',
     ANT_SIM_CONFIG.charts.lengthThreshold,
     ANT_SIM_CONFIG.charts.aggregationSize
-  )
+  )*/
 
   const foodChart = new AntsChart(
     ANT_SIM_CONFIG.ants.numberOfColonies,
@@ -85,7 +105,9 @@ function setup() {
   )
 
   const charts = {
-    totalFoodChart: totalFoodChart,
+    foodPheromones: foodPheromoneChart,
+    homePheromones: homePheromoneChart,
+    //totalFoodChart: totalFoodChart,
     foodChart: foodChart,
     healthChart: healthChart,
     populationChart: populationChart,
