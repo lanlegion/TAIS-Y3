@@ -1,5 +1,5 @@
 const ANT_SIM_CONFIG = {
-  simTime: 5000, // In ticks
+  simTime: 50, //5000, // In ticks
   map: {
     obstacles: false,
     drawPheromones: true,
@@ -8,7 +8,7 @@ const ANT_SIM_CONFIG = {
     height: 300, // In pixels
     colors: {
       colony: [
-        '#3A948F',
+        '#153b5b',
         '#ffae52',
         '#c2f3e7',
         '#ff2020',
@@ -16,7 +16,7 @@ const ANT_SIM_CONFIG = {
         '#9933d4',
         '#000000',
       ],
-      foodColor: '#75b8c8',
+      foodColor: '#1b992c',
       backgroundColor: '#969E9E',//'#e6f5f2',
       deadAntColor: '#707070',
       antWithFood: '#14f43c',
@@ -58,12 +58,12 @@ const ANT_SIM_CONFIG = {
     useDiffusion: true,
     foodDiffusion: 0.01,
     homeDiffusion: 0.01,
-    dangerDiffusion: 0.5,
+    dangerDiffusion: 0.05,
     foodDecay: 0.94,
     homeDecay: 0.94,
     dangerDecay: 0.94, // added danger decay
     existingLimit: 0.06,
-    useDanger: true, // added danger switch
+    useDanger: false, // added danger switch
   },
   probabilities: {
     maintainDirectionOnRandom: 0.75,

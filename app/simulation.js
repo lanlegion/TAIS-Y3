@@ -421,7 +421,6 @@ class Simulation {
       } else {
         this._leavePheromone('home',currentCell,quantity,ant.colony)
       }
-      this.pheromoneCells.add(currentCell)
     }
     // danger pheromone, left in the cell when the ant dies
     // and isn't holding food
@@ -433,25 +432,34 @@ class Simulation {
       !ant.carryingFood
     ) {
       this._leavePheromone('danger',currentCell,quantity,ant.colony)
-      this.pheromoneCells.add(currentCell) // TODO refactor?
     }
   }
 
   //added
   _leavePheromone(key, currentCell, quantity, colony)
   {
+    if (quantity <= 0) 
+    {
+      // no pheromone actually added
+      console.log('no',key)
+      return
+    }
     switch (key)
     {
       case 'food': 
         currentCell.addFoodPheromone(quantity, colony)
         this.pheroFoodCells.add(currentCell)
+        break
       case 'home':
         currentCell.addHomePheromone(quantity, colony)
         this.pheroHomeCells.add(currentCell)
+        break
       case 'danger':
         currentCell.addDangerPheromone(quantity, colony)
         this.pheroDangerCells.add(currentCell)
+        break
     }
+    this.pheromoneCells.add(currentCell)
   }
 
   // Added pheromone diffusion
@@ -478,12 +486,12 @@ class Simulation {
       const originalAmount = cell.pheromones[key][0]
       if (originalAmount)
       {
-        console.log('diffusion at',currentCell.x,currentCell.y,'|',key,'phero was',JSON.stringify(currentCell.pheromones[key][0]),'pheromones',key,':',JSON.stringify(currentCell.pheromones[key]))
-        console.log('phero to add | original:',originalAmount,'with diffusion:',originalAmount*diffusion)
+        //console.log('diffusion at',currentCell.x,currentCell.y,'|',key,'phero was',JSON.stringify(currentCell.pheromones[key][0]),'pheromones',key,':',JSON.stringify(currentCell.pheromones[key]))
+        //console.log('phero to add | original:',originalAmount,'with diffusion:',originalAmount*diffusion)
         leavePheromone(key,currentCell,originalAmount*diffusion,0)
-        console.log('and is now ',currentCell.pheromones[key][0] )
+        //console.log('and is now ',currentCell.pheromones[key][0] )
       } 
-      else console.log('pheromone cell has no',key,'pheromone')
+      //else console.log('pheromone cell has no',key,'pheromone')
     }
     }
   }
@@ -606,7 +614,7 @@ class Simulation {
         // TODO NOTE: only works for one colony
         const alpha = cell.pheromones.food[0]/alphaScale
         fill('rgba(50,255,255,' + alpha + ')') // cyan = food phero
-        //console.log(cell.pheromones.food)
+        //console.log(alpha)
         drawCell(cell, this.config.map.drawScale)
       })
       this.pheroHomeCells.forEach((cell) => {
@@ -617,6 +625,7 @@ class Simulation {
       }) 
       this.pheroDangerCells.forEach((cell) => {
         const alpha = cell.pheromones.danger[0]/alphaScale
+        //if (!alpha) console.log('yo')
         fill('rgba(155,20,20,'+ alpha +')') // dark red = danger phero
         drawCell(cell, this.config.map.drawScale)
       })
@@ -679,7 +688,7 @@ class Simulation {
   }
 
   debugHtmlString() {
-    let prettyString = `Tick: ${this.tick}<br>Cells with pheromone in set: ${this.pheromoneCells.size}`
+    let prettyString = `Tick: ${this.tick}<br>Cells with pheromone in set: ${this.pheromoneCells.size}<br>Cells with food pheromone: ${this.pheroFoodCells.size}<br>Cells with home pheromone: ${this.pheroHomeCells.size}<br>Cells with death pheromone: ${this.pheroDangerCells.size}`
     return prettyString
   }
 
