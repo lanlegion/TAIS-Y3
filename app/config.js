@@ -1,4 +1,5 @@
 const ANT_SIM_CONFIG = {
+  simTime: 5000, // In ticks
   map: {
     obstacles: false,
     drawPheromones: true,
@@ -55,7 +56,9 @@ const ANT_SIM_CONFIG = {
   },
   pheromones: {
     useDiffusion: true,
-    diffusion: 0.01,
+    foodDiffusion: 0.01,
+    homeDiffusion: 0.01,
+    dangerDiffusion: 0.5,
     foodDecay: 0.94,
     homeDecay: 0.94,
     dangerDecay: 0.94, // added danger decay

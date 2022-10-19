@@ -273,6 +273,7 @@ class Simulation {
    * Executes one tick of the simulation.
    */
   run(isDrawing) {
+    if(this.tick >= this.config.simTime) return; // stop if sim time is over
     let newAntsOnMap = {}
     this.tick++
     this.ants.forEach((colony, index) => {
@@ -302,7 +303,7 @@ class Simulation {
     })
     this.antsOnMap = newAntsOnMap
     if (this.config.pheromones.useDiffusion) {
-      this._diffusePheromones(this.ants[0]) // refactor
+      this._diffusePheromones(this.ants[0][0].directions) // refactor
     }
     this._decayPheromone()
     this._consumeFood()
@@ -326,7 +327,7 @@ class Simulation {
     // TODO refactor
     let foodPheromoneStats = []
     let homePheromoneStats = []
-    let totalFoodCurrentStats = []
+    //let totalFoodCurrentStats = []
     let foodCurrentStats = []
     let healthCurrentStats = []
     let populationCurrentStats = []
@@ -336,15 +337,15 @@ class Simulation {
     for (let colony = 0; colony < this.colonies.length; colony++) {
       if (this.colonies[colony].numberOfAnts === 0) {
         // TODO refactor
-        totalFoodCurrentStats.push(null)
+        //totalFoodCurrentStats.push(null)
         foodCurrentStats.push(null)
         healthCurrentStats.push(null)
         populationCurrentStats.push(null)
         deadCurrentStats.push(null)
         averageAge.push(null)
       } else {
-        console.log('total food',this.colonies[colony].totalFood)
-        totalFoodCurrentStats.push(this.colonies[colony].totalFood)
+        //console.log('total food',this.colonies[colony].totalFood)
+        //totalFoodCurrentStats.push(this.colonies[colony].totalFood)
         foodCurrentStats.push(this.colonies[colony].food)
         healthCurrentStats.push(this.colonies[colony].averageHealth)
         populationCurrentStats.push(this.colonies[colony].numberOfAnts)
@@ -416,11 +417,9 @@ class Simulation {
   _antLeavesPheromone(ant, currentCell, quantity = 1) {
     if (currentCell !== null && !ant.isDead) {
       if (ant.carryingFood) {
-        currentCell.addFoodPheromone(quantity, ant.colony)
-        this.pheroFoodCells.add(currentCell)
+      this._leavePheromone('food',currentCell,quantity,ant.colony)
       } else {
-        currentCell.addHomePheromone(quantity, ant.colony)
-        this.pheroHomeCells.add(currentCell)
+        this._leavePheromone('home',currentCell,quantity,ant.colony)
       }
       this.pheromoneCells.add(currentCell)
     }
@@ -433,24 +432,59 @@ class Simulation {
       ant.isDead &&
       !ant.carryingFood
     ) {
-      currentCell.addDangerPheromone(quantity, ant.colony)
+      this._leavePheromone('danger',currentCell,quantity,ant.colony)
       this.pheromoneCells.add(currentCell) // TODO refactor?
-      this.pheroDangerCells.add(currentCell)
+    }
+  }
+
+  //added
+  _leavePheromone(key, currentCell, quantity, colony)
+  {
+    switch (key)
+    {
+      case 'food': 
+        currentCell.addFoodPheromone(quantity, colony)
+        this.pheroFoodCells.add(currentCell)
+      case 'home':
+        currentCell.addHomePheromone(quantity, colony)
+        this.pheroHomeCells.add(currentCell)
+      case 'danger':
+        currentCell.addDangerPheromone(quantity, colony)
+        this.pheroDangerCells.add(currentCell)
     }
   }
 
   // Added pheromone diffusion
   _diffusePheromones(directions) {
-    //console.log('test')
-    for (let cell in this.pheromoneCells) {
-      for (let direction in directions) {
+    //console.log('directions',directions)
+    for (let cell of this.pheromoneCells) { //TODO use separate phero cells?
+      for (let direction of directions) {
+        //console.log('center cell:',cell.x,',',cell.y,'neighbour:',cell.x+direction.x,cell.y+direction.y,'directions:',direction.x,direction.y)   
         const currentCell = this.getCell(
           cell.x + direction.x,
           cell.y + direction.y
         )
-        currentCell.pheromones = cell.pheromones
-        console.log('diffusion', currentCell.pheromones)
+        if (currentCell)
+        {
+            addToNeighbour(this._leavePheromone.bind(this),'food',currentCell,this.config.pheromones.foodDiffusion)
+            addToNeighbour(this._leavePheromone.bind(this),'home',currentCell,this.config.pheromones.homeDiffusion)
+            addToNeighbour(this._leavePheromone.bind(this),'danger',currentCell,this.config.pheromones.dangerDiffusion)
+        }  
+        //else console.log('cell at (',cell.x+direction.x,cell.y+direction.y,') is null')      
       }
+      
+    function addToNeighbour(leavePheromone, key, currentCell, diffusion)
+    {
+      const originalAmount = cell.pheromones[key][0]
+      if (originalAmount)
+      {
+        console.log('diffusion at',currentCell.x,currentCell.y,'|',key,'phero was',JSON.stringify(currentCell.pheromones[key][0]),'pheromones',key,':',JSON.stringify(currentCell.pheromones[key]))
+        console.log('phero to add | original:',originalAmount,'with diffusion:',originalAmount*diffusion)
+        leavePheromone(key,currentCell,originalAmount*diffusion,0)
+        console.log('and is now ',currentCell.pheromones[key][0] )
+      } 
+      else console.log('pheromone cell has no',key,'pheromone')
+    }
     }
   }
 
@@ -565,27 +599,25 @@ class Simulation {
     noStroke()
 
     // TODO refactor
-    if (this.config.map.drawPheromones) {
+    if (this.config.map.drawPheromones) {      
+        // alpha based on pheromone concentration, multiplied by scale
       const alphaScale = 1
-      //fill('rgba(50,255,255,0.5)') // cyan = food phero
       this.pheroFoodCells.forEach((cell) => {
-        // TODO alpha based on pheromone concentration?
         // TODO NOTE: only works for one colony
         const alpha = cell.pheromones.food[0]/alphaScale
-        //console.log(cell.pheromones.food,'-',alpha)
-        fill('rgba(50,255,255,' + alpha + ')') // green = food phero
+        fill('rgba(50,255,255,' + alpha + ')') // cyan = food phero
         //console.log(cell.pheromones.food)
         drawCell(cell, this.config.map.drawScale)
       })
-      //fill('rgba(255,70,220,0.5)') // magenta = home phero
       this.pheroHomeCells.forEach((cell) => {
         const alpha = cell.pheromones.home[0]/alphaScale
         //console.log(alpha)
-        fill('rgba(255,70,220,' + alpha + ')') 
+        fill('rgba(255,70,220,' + alpha + ')') // magenta = home phero
         drawCell(cell, this.config.map.drawScale)
-      })
-      fill('rgba(255,50,50,0.5)') // red = danger phero
+      }) 
       this.pheroDangerCells.forEach((cell) => {
+        const alpha = cell.pheromones.danger[0]/alphaScale
+        fill('rgba(155,20,20,'+ alpha +')') // dark red = danger phero
         drawCell(cell, this.config.map.drawScale)
       })
     }
@@ -675,16 +707,18 @@ class Simulation {
     let cleanedPheromoneColonyCells = {
       home: 0,
       food: 0,
+      danger: 0
     }
     this.cells.forEach((row) => {
       row.forEach((cell) => {
         const cleanResult = cell.cleanPheromones()
         cleanedPheromoneColonyCells.food += cleanResult.food
         cleanedPheromoneColonyCells.home += cleanResult.home
+        cleanedPheromoneColonyCells.danger += cleanResult.danger
       })
     })
     console.log(
-      `Cleaned pheromones: food - ${cleanedPheromoneColonyCells.food}   home - ${cleanedPheromoneColonyCells.home}`
+      `Cleaned pheromones: food - ${cleanedPheromoneColonyCells.food}   home - ${cleanedPheromoneColonyCells.home}    danger - ${cleanedPheromoneColonyCells.danger}`
     )
   }
 }

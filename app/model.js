@@ -377,7 +377,7 @@ class Pheromones {
     for (let dangerKey in this.danger) {
       if (this.home[dangerKey] <= this.existingLimit) {
         delete this.home[dangerKey]
-        homeCleanedPerColony++
+        dangerCleanedPerColony++
       }
     }
     return {
@@ -433,6 +433,7 @@ class Cell {
       this.pheromones.danger[colony] = 0.0
     }
     this.pheromones.danger[colony] += value
+    //console.log('added',value,'danger for a total of',this.pheromones.danger[colony])
   }
 
   /**
