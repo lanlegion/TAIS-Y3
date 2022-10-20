@@ -1,5 +1,5 @@
 const ANT_SIM_CONFIG = {
-  simTime: 100, //5000, // In ticks
+  simTime: 500, //5000, // In ticks
   map: {
     obstacles: false,
     drawPheromones: true,
@@ -47,7 +47,7 @@ const ANT_SIM_CONFIG = {
   },
   food: {
     numberOfFoodStacks: 3, //30,
-    foodStackSize: 10, //20,
+    foodStackSize: 20, //20,
     foodItemValue: 1,
     antHunger: 0, // How much food an ant will eat at each tick
     birthsThreshold: 0, // Minimum amount of food that a colony must have to multiply
@@ -55,9 +55,9 @@ const ANT_SIM_CONFIG = {
     healingSpeed: 0.2,
   },
   pheromones: {
-    useDiffusion: true,
-    foodDiffusion: 0.001,
-    homeDiffusion: 0.001,
+    useDiffusion: false,
+    foodDiffusion: 0.6,
+    homeDiffusion: 0.6,
     dangerDiffusion: 0.05,
     foodDecay: 0.94,
     homeDecay: 0.94,
@@ -77,7 +77,7 @@ const ANT_SIM_CONFIG = {
     intervalPush: 10,
   },
   debug: true,
-  drawingTicks: 10,
+  drawingTicks: 1,
   playSounds: false,
   cleanupInterval: 100,
 }

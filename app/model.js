@@ -298,6 +298,7 @@ class Ant {
     this.age++
     if (this.age >= this.lifeSpan) {
       this.isDead = true
+      this.justDied = true
       this.colonyStats.antDied()
     }
   }
@@ -403,6 +404,31 @@ class Cell {
     this.pheromones = new Pheromones()
   }
 
+  // added general method for adding
+  addPheromone(key,value,valueScale,colony)
+  {
+    if (!this.pheromones[key][colony]) {
+      this.pheromones[key][colony] = 0.0
+    }
+    //this.pheromones[key][colony] += value
+    // top-off
+    this.pheromones[key][colony] = Math.min(this.pheromones[key][colony]+valueScale*value,value)
+  }
+
+  // added general method for getting
+  getPheromone(key,colony)
+  {
+    /*if (!this.pheromones[key])
+    {
+      console.log('ERROR no',key)
+      return 0
+    }*/
+    const pheromone = this.pheromones[key][colony]
+    if (pheromone === undefined) {
+      return 0
+    }
+    return pheromone
+  }
   /**
    * Adds food pheromone to the cell.
    * @param value {number} the amount of food pheromone.
