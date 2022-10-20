@@ -441,7 +441,7 @@ class Simulation {
     if (quantity <= 0) 
     {
       // no pheromone actually added
-      console.log('no',key)
+      console.log('negative',key,'pheromone:',quantity)
       return
     }
     switch (key)
@@ -465,7 +465,14 @@ class Simulation {
   // Added pheromone diffusion
   _diffusePheromones(directions) {
     //console.log('directions',directions)
-    for (let cell of this.pheromoneCells) { //TODO use separate phero cells?
+    for (let [key,cells,diffusion] of [['food',this.pheroFoodCells,this.config.pheromones.foodDiffusion],
+                                        ['home',this.pheroHomeCells,this.config.pheromones.homeDiffusion],
+                                        ['danger',this.pheroDangerCells,this.config.pheromones.dangerDiffusion]]) { //TODO use separate phero cells?
+      for (let cell of cells)
+      {
+        const originalAmount = cell.pheromones[key][0]
+        if (originalAmount && originalAmount > 0)
+        {
       for (let direction of directions) {
         //console.log('center cell:',cell.x,',',cell.y,'neighbour:',cell.x+direction.x,cell.y+direction.y,'directions:',direction.x,direction.y)   
         const currentCell = this.getCell(
@@ -474,25 +481,16 @@ class Simulation {
         )
         if (currentCell)
         {
-            addToNeighbour(this._leavePheromone.bind(this),'food',currentCell,this.config.pheromones.foodDiffusion)
-            addToNeighbour(this._leavePheromone.bind(this),'home',currentCell,this.config.pheromones.homeDiffusion)
-            addToNeighbour(this._leavePheromone.bind(this),'danger',currentCell,this.config.pheromones.dangerDiffusion)
+            //console.log('diffusion at',currentCell.x,currentCell.y,'|',key,'phero was',JSON.stringify(currentCell.pheromones[key][0]),'pheromones',key,':',JSON.stringify(currentCell.pheromones[key]))
+            //console.log('phero to add | original:',originalAmount,'with diffusion:',originalAmount*diffusion)
+            this._leavePheromone(key,currentCell,originalAmount*diffusion,0)
+            //console.log('and is now ',currentCell.pheromones[key][0] )
+          } 
         }  
         //else console.log('cell at (',cell.x+direction.x,cell.y+direction.y,') is null')      
       }
-      
-    function addToNeighbour(leavePheromone, key, currentCell, diffusion)
-    {
-      const originalAmount = cell.pheromones[key][0]
-      if (originalAmount)
-      {
-        //console.log('diffusion at',currentCell.x,currentCell.y,'|',key,'phero was',JSON.stringify(currentCell.pheromones[key][0]),'pheromones',key,':',JSON.stringify(currentCell.pheromones[key]))
-        //console.log('phero to add | original:',originalAmount,'with diffusion:',originalAmount*diffusion)
-        leavePheromone(key,currentCell,originalAmount*diffusion,0)
-        //console.log('and is now ',currentCell.pheromones[key][0] )
-      } 
-      //else console.log('pheromone cell has no',key,'pheromone')
-    }
+      else console.log('pheromone cell has no',key,'pheromone')
+      }
     }
   }
 
@@ -608,25 +606,26 @@ class Simulation {
 
     // TODO refactor
     if (this.config.map.drawPheromones) {      
-        // alpha based on pheromone concentration, multiplied by scale
+      const relativeAlpha = false
+      const absoluteAlpha = 0.5
+      // alpha based on pheromone concentration, multiplied by scale
       const alphaScale = 1
       this.pheroFoodCells.forEach((cell) => {
         // TODO NOTE: only works for one colony
-        const alpha = cell.pheromones.food[0]/alphaScale
-        fill('rgba(50,255,255,' + alpha + ')') // cyan = food phero
-        //console.log(alpha)
+        const alpha = relativeAlpha ? cell.pheromones.food[0]/alphaScale :absoluteAlpha
+        fill('rgba(50,255,255,' + alpha.toFixed(2) + ')') // cyan = food phero
         drawCell(cell, this.config.map.drawScale)
       })
       this.pheroHomeCells.forEach((cell) => {
-        const alpha = cell.pheromones.home[0]/alphaScale
-        //console.log(alpha)
-        fill('rgba(255,70,220,' + alpha + ')') // magenta = home phero
+        const alpha = relativeAlpha ? cell.pheromones.home[0]/alphaScale:absoluteAlpha
+        //if (this.tick <=10) console.log(typeof(alpha))
+        fill('rgba(255,70,220,' + alpha.toFixed(2) + ')') // magenta = home phero
         drawCell(cell, this.config.map.drawScale)
       }) 
       this.pheroDangerCells.forEach((cell) => {
-        const alpha = cell.pheromones.danger[0]/alphaScale
+        const alpha = relativeAlpha ?cell.pheromones.danger[0]/alphaScale:absoluteAlpha
         //if (!alpha) console.log('yo')
-        fill('rgba(155,20,20,'+ alpha +')') // dark red = danger phero
+        fill('rgba(155,20,20,'+ alpha.toFixed(2) +')') // dark red = danger phero
         drawCell(cell, this.config.map.drawScale)
       })
     }

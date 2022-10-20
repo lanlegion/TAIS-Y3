@@ -1,11 +1,11 @@
 const ANT_SIM_CONFIG = {
-  simTime: 50, //5000, // In ticks
+  simTime: 5000, //5000, // In ticks
   map: {
     obstacles: false,
     drawPheromones: true,
     drawScale: 3, // scale drawing
-    width: 300, // In pixels
-    height: 300, // In pixels
+    width: 100,//300, // In pixels
+    height: 100,//300, // In pixels
     colors: {
       colony: [
         '#153b5b',
@@ -46,8 +46,8 @@ const ANT_SIM_CONFIG = {
     minimumAntsForCreation: 10,
   },
   food: {
-    numberOfFoodStacks: 30,
-    foodStackSize: 20,
+    numberOfFoodStacks: 1, //30,
+    foodStackSize: 5, //20,
     foodItemValue: 1,
     antHunger: 0, // How much food an ant will eat at each tick
     birthsThreshold: 0, // Minimum amount of food that a colony must have to multiply
