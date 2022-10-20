@@ -55,15 +55,15 @@ const ANT_SIM_CONFIG = {
     healingSpeed: 0.2,
   },
   pheromones: {
-    useDiffusion: false,
+    useDiffusion: true,
     foodDiffusion: 0.6,
     homeDiffusion: 0.6,
     dangerDiffusion: 0.05,
     foodDecay: 0.94,
     homeDecay: 0.94,
-    dangerDecay: 0.94, // added danger decay
+    dangerDecay: 0.98, // added danger decay
     existingLimit: 0.06,
-    useDanger: false, // added danger switch
+    useDanger: true, // added danger switch
   },
   probabilities: {
     maintainDirectionOnRandom: 0.75,

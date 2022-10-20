@@ -75,18 +75,16 @@ class Ant {
     }
 
     // Obstacle (wall)
-    if (forwardCell.type == CellType.WALL)
-    {
-      this.turnAround();
-    }
-    else if (this.carryingFood && forwardCell.type === CellType.HOME) {
-      this.carryingFood = false;
-      this.simulation.storeFood(this.colony, this.carryingCapacity);
-      this.turnAround();
+    if (forwardCell.type == CellType.WALL) {
+      this.turnAround()
+    } else if (this.carryingFood && forwardCell.type === CellType.HOME) {
+      this.carryingFood = false
+      this.simulation.storeFood(this.colony, this.carryingCapacity)
+      this.turnAround()
     } else if (!this.carryingFood && forwardCell.type === CellType.FOOD) {
-      this.carryingFood = true;
-      this.simulation.clearFood(forwardCell);
-      this.turnAround();
+      this.carryingFood = true
+      this.simulation.clearFood(forwardCell)
+      this.turnAround()
     }
 
     this.seek(!this.carryingFood)
@@ -405,19 +403,20 @@ class Cell {
   }
 
   // added general method for adding
-  addPheromone(key,value,valueScale,colony)
-  {
+  addPheromone(key, value, valueScale, colony) {
     if (!this.pheromones[key][colony]) {
       this.pheromones[key][colony] = 0.0
     }
     //this.pheromones[key][colony] += value
     // top-off
-    this.pheromones[key][colony] = Math.min(this.pheromones[key][colony]+valueScale*value,value)
+    this.pheromones[key][colony] = Math.min(
+      this.pheromones[key][colony] + valueScale * value,
+      value
+    )
   }
 
   // added general method for getting
-  getPheromone(key,colony)
-  {
+  getPheromone(key, colony) {
     /*if (!this.pheromones[key])
     {
       console.log('ERROR no',key)
