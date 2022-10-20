@@ -312,6 +312,10 @@ class Simulation {
     if (this.tick % this.config.cleanupInterval === 0) {
       this._cleanup()
     }
+    if (this.tick % 10 == 0)
+    {
+      console.log(this.tick,[...this.pheroFoodCells].every(x => this.pheroHomeCells.has(x)),[...this.pheroFoodCells].filter(x => this.pheroHomeCells.has(x)))
+    }
   }
   
 
@@ -417,9 +421,9 @@ class Simulation {
   _antLeavesPheromone(ant, currentCell, quantity = 1) {
     if (currentCell !== null && !ant.isDead) {
       if (ant.carryingFood) {
-      this._leavePheromone('food',currentCell,quantity,ant.colony)
+      this._leavePheromone('food',this.pheroFoodCells,currentCell,quantity,ant.colony)
       } else {
-        this._leavePheromone('home',currentCell,quantity,ant.colony)
+        this._leavePheromone('home',this.pheroHomeCells,currentCell,quantity,ant.colony)
       }
     }
     // danger pheromone, left in the cell when the ant dies
@@ -431,12 +435,12 @@ class Simulation {
       ant.isDead &&
       !ant.carryingFood
     ) {
-      this._leavePheromone('danger',currentCell,quantity,ant.colony)
+      this._leavePheromone('danger',this.pheroDangerCells,currentCell,quantity,ant.colony)
     }
   }
 
   //added
-  _leavePheromone(key, currentCell, quantity, colony)
+  _leavePheromone(key, cells, currentCell, quantity, colony,pheroCells=this.pheromoneCells)
   {
     if (quantity <= 0) 
     {
@@ -448,26 +452,26 @@ class Simulation {
     {
       case 'food': 
         currentCell.addFoodPheromone(quantity, colony)
-        this.pheroFoodCells.add(currentCell)
         break
       case 'home':
         currentCell.addHomePheromone(quantity, colony)
-        this.pheroHomeCells.add(currentCell)
         break
       case 'danger':
         currentCell.addDangerPheromone(quantity, colony)
-        this.pheroDangerCells.add(currentCell)
         break
     }
-    this.pheromoneCells.add(currentCell)
+    cells.add(currentCell)
+    pheroCells.add(currentCell)
   }
 
   // Added pheromone diffusion
   _diffusePheromones(directions) {
     //console.log('directions',directions)
-    for (let [key,cells,diffusion] of [['food',this.pheroFoodCells,this.config.pheromones.foodDiffusion],
-                                        ['home',this.pheroHomeCells,this.config.pheromones.homeDiffusion],
-                                        ['danger',this.pheroDangerCells,this.config.pheromones.dangerDiffusion]]) { //TODO use separate phero cells?
+    for (let {key,cells,diffusion} of [{key: 'food',cells:this.pheroFoodCells,diffusion:this.config.pheromones.foodDiffusion},
+                                        {key:'home',cells:this.pheroHomeCells,diffusion:this.config.pheromones.homeDiffusion},
+                                        {key:'danger',cells:this.pheroDangerCells,diffusion:this.config.pheromones.dangerDiffusion}]) { //TODO use separate phero cells?
+      const newCells = new Set(cells)  // Don't do it in place      
+      const newPheroCells = new Set(this.pheromoneCells)                           
       for (let cell of cells)
       {
         const originalAmount = cell.pheromones[key][0]
@@ -483,7 +487,7 @@ class Simulation {
         {
             //console.log('diffusion at',currentCell.x,currentCell.y,'|',key,'phero was',JSON.stringify(currentCell.pheromones[key][0]),'pheromones',key,':',JSON.stringify(currentCell.pheromones[key]))
             //console.log('phero to add | original:',originalAmount,'with diffusion:',originalAmount*diffusion)
-            this._leavePheromone(key,currentCell,originalAmount*diffusion,0)
+            this._leavePheromone(key,newCells,currentCell,originalAmount*diffusion,0,newPheroCells)
             //console.log('and is now ',currentCell.pheromones[key][0] )
           } 
         }  
@@ -491,7 +495,16 @@ class Simulation {
       }
       else console.log('pheromone cell has no',key,'pheromone')
       }
+      // TODO refactor
+      switch (key)
+      {
+        case 'food': this.pheroFoodCells=newCells 
+        case 'home': this.pheroHomeCells=newCells 
+        case 'danger': this.pheroDangerCells=newCells
+      }
+      this.pheromoneCells=newPheroCells
     }
+
   }
 
   /**
@@ -687,7 +700,13 @@ class Simulation {
   }
 
   debugHtmlString() {
-    let prettyString = `Tick: ${this.tick}<br>Cells with pheromone in set: ${this.pheromoneCells.size}<br>Cells with food pheromone: ${this.pheroFoodCells.size}<br>Cells with home pheromone: ${this.pheroHomeCells.size}<br>Cells with death pheromone: ${this.pheroDangerCells.size}`
+    let prettyString = `Tick: ${this.tick}<br>Cells with pheromone in set: ${this.pheromoneCells.size}<br>
+    Cells with food pheromone: ${this.pheroFoodCells.size}<br>
+    Cells with home pheromone: ${this.pheroHomeCells.size}<br>
+    Cells with death pheromone: ${this.pheroDangerCells.size}<br>`
+    /*Intersection food and home: ${[...this.pheroFoodCells].filter(x => this.pheroHomeCells.has(x)).length}<br>
+    Difference food and home: ${[...this.pheroFoodCells].filter(x => !this.pheroHomeCells.has(x)).length}
+    `*/
     return prettyString
   }
 
