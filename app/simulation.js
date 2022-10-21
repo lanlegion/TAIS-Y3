@@ -131,9 +131,12 @@ class Simulation {
   _initFoodStacks(occupiedCells) {
     console.log('Initializing food stacks')
     this.foods = []
-    if (this.config.map.randomLocations) {
+    //if (this.config.map.randomLocations) {
       for (let food = 0; food < this.config.food.numberOfFoodStacks; food++) {
-        const randomLocation = this._getRandomLocationOnMap()
+        let randomLocation = this.config.map.foodPosition
+    if (this.config.map.randomLocations) {
+         randomLocation = this._getRandomLocationOnMap()
+    }
         for (
           let x = randomLocation.x;
           x < randomLocation.x + this.config.food.foodStackSize &&
@@ -156,17 +159,18 @@ class Simulation {
           }
         }
       }
-    } else {
+    /*} else {
       for (let food = 0; food < this.config.food.numberOfFoodStacks; food++) {
         this._gatRandomSquareLocations(CellType.FOOD, {
           x: this.config.food.foodStackSize,
           y: this.config.food.foodStackSize,
         }).forEach((cell) => {
+          occupiedCells.add(`${cell.x}-${cell.y}`)
           cell.type = CellType.FOOD
           this.foods.push(cell)
         })
       }
-    }
+    }*/
   }
 
   // Added obstacles
