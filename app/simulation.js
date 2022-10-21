@@ -2,6 +2,19 @@ class Simulation {
   constructor(config, uiComponents, charts) {
     console.log(`Simulation config: ${JSON.stringify(config, undefined, 2)}`)
 
+    // TODO is copy paste from ant directions
+    this.directions = [
+      { x: 0, y: -1 },
+      { x: 1, y: -1 },
+      { x: 1, y: 0 },
+      { x: 1, y: 1 },
+      { x: 0, y: 1 },
+      { x: -1, y: 1 },
+      { x: -1, y: 0 },
+      { x: -1, y: -1 },
+    ]
+    //[{x:1, y:1}]
+
     this.maxPheromone = 0
     this.diffuseAmount = 0
 
@@ -303,7 +316,8 @@ class Simulation {
     })
     this.antsOnMap = newAntsOnMap
     if (this.config.pheromones.useDiffusion) {
-      this._diffusePheromones(this.ants[0][0].directions) // refactor
+      //this._diffusePheromones(this.ants[0][0].directions) // refactor
+      this._diffusePheromones(this.directions)
     }
     this._decayPheromone()
     this._consumeFood()
@@ -374,13 +388,15 @@ class Simulation {
     }
     //console.log('phero food cells', this.pheroFoodCells)
     //const foodPheromones = sumPheromones(this.pheroFoodCells, 'food')
-    const foodPheromones = sumPheromones(this.pheromoneCells, 'food')
+    this.foodPheroAmount = sumPheromones(this.pheromoneCells, 'food')
     //console.log('foodpheros',foodPheromones)
-    foodPheromoneStats.push(foodPheromones)
+    foodPheromoneStats.push(this.foodPheroAmount)
     //const homePheromones = sumPheromones(this.pheroHomeCells, 'home')
-    const homePheromones = sumPheromones(this.pheromoneCells, 'home')
+    this.homePheroAmount = sumPheromones(this.pheromoneCells, 'home')
     //console.log('homepheros',homePheromones)
-    homePheromoneStats.push(homePheromones)
+    homePheromoneStats.push(this.homePheroAmount)
+    
+    this.dangerPheroAmount = sumPheromones(this.pheromoneCells, 'danger')
 
     // Push to charts
     this.charts.foodPheromones.pushData(
@@ -428,8 +444,8 @@ class Simulation {
       ant.justDied &&
       !ant.carryingFood
     ) {
-      console.log('dropped death phero at', currentCell.x, currentCell.y)
-      this._leavePheromone('danger', currentCell, quantity, ant.colony)
+      //console.log('dropped death phero at', currentCell.x, currentCell.y)
+      this._leavePheromone('danger', currentCell, this.config.pheromones.deathQuantity, ant.colony)
       this.pheromoneCells.add(currentCell)
       ant.justDied = false // TODO NOTE could also have the corpse produce death pheromone for some time
     }
@@ -445,7 +461,8 @@ class Simulation {
     const currentAmount = currentCell.getPheromone(key, colony)
     // Use top-off from paper
     if (currentAmount >= quantity) return
-    currentCell.addPheromone(key, quantity, diffusing ? 1 : 0.2, colony)
+    currentCell.addPheromone(key, quantity, diffusing ? 0.5 : 0.2, colony)
+    if (diffusing) this.diffuseAmount += quantity
     if (currentAmount > this.maxPheromone) {
       this.maxPheromone = currentAmount
     }
@@ -454,6 +471,7 @@ class Simulation {
   // Added pheromone diffusion
   _diffusePheromones(directions) {
     const newPheroCells = new Set(this.pheromoneCells)
+    let logs = 0
     for (let cell of this.pheromoneCells) {
       for (let direction of directions) {
         //console.log('center cell:',cell.x,',',cell.y,'neighbour:',cell.x+direction.x,cell.y+direction.y,'directions:',direction.x,direction.y)
@@ -462,6 +480,7 @@ class Simulation {
           cell.y + direction.y
         )
         if (currentCell) {
+          let changed = false
           const pheroConfig = this.config.pheromones
           for (let [key, diffusion] of [
             ['food', pheroConfig.foodDiffusion],
@@ -470,23 +489,38 @@ class Simulation {
           ]) {
             const originalAmount = cell.getPheromone(key, 0)
             if (originalAmount && originalAmount > 0) {
+              changed = true
               const amount = originalAmount * diffusion
+
+              /*if (logs < 10 && this.tick % 10 == 0) {
+              console.log(key,currentCell.x,currentCell.y,originalAmount)
+              logs++
+            }*/
               this._leavePheromone(key, currentCell, amount, 0, true)
               //if (!this.pheromoneCells.has(currentCell))
-              this.diffuseAmount += amount
             }
           }
-          newPheroCells.add(currentCell)
+          if (changed) newPheroCells.add(currentCell)
         }
       }
     }
     //console.log([...newPheroCells].filter(x => !this.pheromoneCells.has(x)))
     const oldCells = this.pheromoneCells
     this.pheromoneCells = newPheroCells
-    /*if (this.tick % this.config.drawingTicks !== 0) {
+    /*if (this.tick % 10 !== 0) {
       return
-    }*/
-    //if (this.tick <= this.config.simTime) console.log(oldCells.size,this.pheromoneCells.size,newPheroCells.size)
+    }
+    if (this.tick <= this.config.simTime)
+      console.log(
+        'tick',
+        this.tick,
+        'old',
+        oldCells.size,
+        'new',
+        this.pheromoneCells.size,
+        'diff',
+        this.pheromoneCells.size - oldCells.size
+      )*/
     //console.log([...this.pheromoneCells].every(x => oldCells.has(x)),[...this.pheromoneCells].filter(x => oldCells.has(x)))
   }
 
@@ -529,7 +563,7 @@ class Simulation {
     let anyAntsBorn = false
     this.colonies.forEach((colony, index) => {
       if (
-        colony.food > this.config.food.birthsThreshold &&
+        colony.food >= this.config.food.birthsThreshold &&
         colony.numberOfAnts > this.config.ants.minimumAntsForCreation &&
         this.tick % this.config.ants.bornInterval === 0
       ) {
@@ -551,13 +585,14 @@ class Simulation {
    * @private
    */
   _bornAntsInColony(colonyId, colony) {
-    const fixedBirthValue = int(
+    const fixedBirthValue = /*int(
       this.config.ants.bornPopulationPercent * colony.numberOfAnts
-    )
-    const numOfNewAnts = this.randomIntFromInterval(
+    )*/ this.config.ants.bornPopulationAbsolute
+    /*const numOfNewAnts = this.randomIntFromInterval(
       fixedBirthValue / this.config.ants.bornDeviation,
       fixedBirthValue * this.config.ants.bornDeviation
-    )
+    )*/
+    const numOfNewAnts = fixedBirthValue
 
     for (let ant = 0; ant < numOfNewAnts; ant++) {
       const initialPosition = this._getInitialPositionForAnt(colonyId)
@@ -594,19 +629,22 @@ class Simulation {
     }
 
     background(this.config.map.colors.backgroundColor)
-    noStroke()
+    //noStroke()
+    stroke('rgba(100, 100, 100, 0.2)')
+    strokeWeight(1)
 
     // TODO refactor
     if (this.config.map.drawPheromones) {
       const relativeAlpha = true
-      const baseAlpha = 0.2
+      const baseAlpha = 0.05
       const absoluteAlpha = 0.5
       // alpha based on pheromone concentration, multiplied by scale
-      const alphaScale = 0.5 / this.maxPheromone
-      console.log('max phero', this.maxPheromone)
+      const alphaScale = 0.6 / this.maxPheromone
+      //console.log('max phero', this.maxPheromone)
       this.pheromoneCells.forEach((cell) => {
         // TODO NOTE: only works for one colony
-        const dangerColour = '255,255,255' //'155,20,20'
+        // yellow danger colour
+        const dangerColour = '255,255,70' //'155,20,20'
         for (let [key, rgb] of [
           ['food', '50,255,255'],
           ['home', '255,70,220'],
@@ -702,9 +740,12 @@ class Simulation {
     Difference food and home: ${
       [...pheroFoodCells].filter((x) => !pheroHomeCells.includes(x)).length
     }<br>
-    Diffused amount: ${this.diffuseAmount}
+    Diffused amount: ${this.diffuseAmount}<br>
+    Food pheromone: ${this.foodPheroAmount}<br>
+    Home pheromone: ${this.homePheroAmount}<br>
+    Death pheromone: ${this.dangerPheroAmount}<br>
     `
-    if (this.tick <= this.config.simTime && this.tick % 10 == 0) {
+    /* if (this.tick <= this.config.simTime && this.tick % 10 == 0) {
       console.log(prettyString)
       console.log(
         this.tick,
@@ -714,7 +755,7 @@ class Simulation {
           : 'NOT EQUAL',
         [...pheroFoodCells].filter((x) => pheroHomeCells.includes(x))
       )
-    }
+    }*/
     return prettyString
   }
 

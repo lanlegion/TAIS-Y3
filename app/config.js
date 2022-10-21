@@ -3,7 +3,7 @@ const ANT_SIM_CONFIG = {
   map: {
     obstacles: false,
     drawPheromones: true,
-    drawScale: 3, // scale drawing
+    drawScale: 5, // scale drawing
     width: 100,//300, // In pixels
     height: 100,//300, // In pixels
     colors: {
@@ -32,18 +32,19 @@ const ANT_SIM_CONFIG = {
   gameSpeed: 1,
   ants: {
     numberOfColonies: 1,
-    antsPerColony: 150,
+    antsPerColony: 2, //150,
     sightRange: 5,
     maxHealth: 100,
-    bornInterval: 10, // Measured in ticks
-    bornPopulationPercent: 0.02,
-    bornDeviation: 2,
-    averageLifeSpan: 500, // Measured in ticks, old: 2000, new: 500
-    lifeSpanDeviation: 400, // Measured in ticks
+    bornInterval: 1, // Measured in ticks
+    bornPopulationPercent: 1,//0.02, //TODO: absolute 2 per timestep??
+    bornPopulationAbsolute: 2,
+    bornDeviation: 0, //2,
+    averageLifeSpan: 500, // Measured in ticks, old: 2000, paper: 500
+    lifeSpanDeviation: 0,//400, // Measured in ticks
     hitDamage: 20,
     hitDeviation: 5,
     extraHitPowerFromFood: 0.005,
-    minimumAntsForCreation: 10,
+    minimumAntsForCreation: 0,//10,
   },
   food: {
     numberOfFoodStacks: 3, //30,
@@ -56,14 +57,15 @@ const ANT_SIM_CONFIG = {
   },
   pheromones: {
     useDiffusion: true,
-    foodDiffusion: 0.6,
-    homeDiffusion: 0.6,
-    dangerDiffusion: 0.05,
+    foodDiffusion: 0.01,
+    homeDiffusion: 0.01,
+    dangerDiffusion: 0.5,
     foodDecay: 0.94,
     homeDecay: 0.94,
     dangerDecay: 0.98, // added danger decay
-    existingLimit: 0.06,
+    existingLimit: 0, //0.0001, //0.06
     useDanger: true, // added danger switch
+    deathQuantity: 5
   },
   probabilities: {
     maintainDirectionOnRandom: 0.75,
