@@ -58,7 +58,7 @@ class Simulation {
     this.homes = []
     for (let colony = 0; colony < this.config.ants.numberOfColonies; colony++) {
       let colonyHomes = []
-      this._gatRandomSquareLocations().forEach((cell) => {
+      this._gatRandomSquareLocations(CellType.HOME).forEach((cell) => {
         if (!occupiedCells.has(`${cell.x}-${cell.y}`)) {
           occupiedCells.add(`${cell.x}-${cell.y}`)
           cell.type = CellType.HOME
@@ -131,28 +131,40 @@ class Simulation {
   _initFoodStacks(occupiedCells) {
     console.log('Initializing food stacks')
     this.foods = []
-    for (let food = 0; food < this.config.food.numberOfFoodStacks; food++) {
-      const randomLocation = this._getRandomLocationOnMap()
-      for (
-        let x = randomLocation.x;
-        x < randomLocation.x + this.config.food.foodStackSize &&
-        x < this.config.map.width;
-        x++
-      ) {
+    if (this.config.map.randomLocations) {
+      for (let food = 0; food < this.config.food.numberOfFoodStacks; food++) {
+        const randomLocation = this._getRandomLocationOnMap()
         for (
-          let y = randomLocation.y;
-          y < randomLocation.y + this.config.food.foodStackSize &&
-          y < this.config.map.height;
-          y++
+          let x = randomLocation.x;
+          x < randomLocation.x + this.config.food.foodStackSize &&
+          x < this.config.map.width;
+          x++
         ) {
-          if (occupiedCells.has(`${x}-${y}`)) {
-            continue
+          for (
+            let y = randomLocation.y;
+            y < randomLocation.y + this.config.food.foodStackSize &&
+            y < this.config.map.height;
+            y++
+          ) {
+            if (occupiedCells.has(`${x}-${y}`)) {
+              continue
+            }
+            occupiedCells.add(`${x}-${y}`)
+            const currentCell = this.cells[x][y]
+            currentCell.type = CellType.FOOD
+            this.foods.push(currentCell)
           }
-          occupiedCells.add(`${x}-${y}`)
-          const currentCell = this.cells[x][y]
-          currentCell.type = CellType.FOOD
-          this.foods.push(currentCell)
         }
+      }
+    } else {
+      for (let food = 0; food < this.config.food.numberOfFoodStacks; food++) {
+        this._gatRandomSquareLocations(CellType.FOOD, {
+          x: this.config.food.foodStackSize,
+          y: this.config.food.foodStackSize,
+        }).forEach((cell) => {
+          cell.type = CellType.FOOD
+          this.foods.push(cell)
+        })
       }
     }
   }
@@ -206,9 +218,23 @@ class Simulation {
    * @return [Cell] the list of random Cells
    * @private
    */
-  _gatRandomSquareLocations(sizes = { x: 10, y: 10 }) {
+  _gatRandomSquareLocations(cellType, sizes = { x: 10, y: 10 }) {
     let randomCells = []
-    const randomLocation = this._getRandomLocationOnMap()
+    let randomLocation = {}
+
+    if (this.config.map.randomLocations) {
+      randomLocation = this._getRandomLocationOnMap()
+    } else {
+      switch (cellType) {
+        case CellType.FOOD:
+          randomLocation = this.config.map.foodPosition
+          break
+        case CellType.HOME:
+          randomLocation = this.config.map.nestPosition
+          console.log(this.config)
+          break
+      }
+    }
     for (let x = randomLocation.x; x < randomLocation.x + sizes.x; x++) {
       for (let y = randomLocation.y; y < randomLocation.y + sizes.y; y++) {
         const newCell = this.getCell(x, y)

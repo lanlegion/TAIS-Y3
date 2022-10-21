@@ -1,6 +1,7 @@
 const ANT_SIM_CONFIG = {
   simTime: 500, //5000, // In ticks
   map: {
+    randomLocations: false,
     obstacles: false,
     drawPheromones: true,
     drawScale: 5, // scale drawing
@@ -21,6 +22,8 @@ const ANT_SIM_CONFIG = {
       deadAntColor: '#707070',
       antWithFood: '#14f43c',
     },
+    nestPosition: { x: 10, y: 10 },
+    foodPosition: { x: 75, y: 75 },
     sizes: {
       home: {
         x: 15,
@@ -33,7 +36,7 @@ const ANT_SIM_CONFIG = {
   ants: {
     numberOfColonies: 1,
     antsPerColony: 2, //150,
-    sightRange: 5,
+    sightRange: 5, //5,
     maxHealth: 100,
     bornInterval: 1, // Measured in ticks
     bornPopulationPercent: 1, //0.02, //TODO: absolute 2 per timestep??
