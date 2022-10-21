@@ -12,13 +12,17 @@
 
     <!-- Local imports -->
     <script src="config.js"></script>
-    <script src="model.js"></script>
+    <script src="model/ant.js"></script>
+    <script src="model/cell.js"></script>
+    <script src="model/colonyStats.js"></script>
+    <script src="model/pheromones.js"></script>
+    <script src="model/UIComponents.js"></script>
     <script src="simulation.js"></script>
     <script src="sketch.js"></script>
     <script src="chart-utils.js"></script>
   </head>
 
-  <body style="margin: 20pt; background-color: rgb(233, 239, 239);">
+  <body style="margin: 20pt; background-color: rgb(233, 239, 239)">
     <audio id="audio_container_born">
       <source src="sounds/born.mp3" type="audio/mpeg" />
     </audio>
@@ -35,41 +39,41 @@
     </div>
 
     <div style="width: 100%; display: flex">
-      <div style="flex: 50%" >
-    <div style="width: 50%; display: flex">
-      <!--<div style="flex: 50%">
+      <div style="flex: 50%">
+        <div style="width: 50%; display: flex">
+          <!--<div style="flex: 50%">
         <canvas id="total_food_chart"></canvas>
       </div>-->
-      <div style="flex: 50%">
-        <canvas id="food_chart"></canvas>
+          <div style="flex: 50%">
+            <canvas id="food_chart"></canvas>
+          </div>
+        </div>
+        <div style="width: 90%; display: flex">
+          <div style="flex: 50%">
+            <canvas id="health_chart"></canvas>
+          </div>
+          <div style="flex: 50%">
+            <canvas id="age_chart"></canvas>
+          </div>
+        </div>
+        <div style="width: 90%; display: flex">
+          <div style="flex: 50%">
+            <canvas id="population_chart"></canvas>
+          </div>
+          <div style="flex: 50%">
+            <canvas id="dead_chart"></canvas>
+          </div>
+        </div>
+        <div style="width: 90%; display: flex">
+          <div style="flex: 50%">
+            <canvas id="food_phero_chart"></canvas>
+          </div>
+          <div style="flex: 50%">
+            <canvas id="home_phero_chart"></canvas>
+          </div>
+        </div>
       </div>
-    </div>
-    <div style="width: 90%; display: flex">
-      <div style="flex: 50%">
-        <canvas id="health_chart"></canvas>
-      </div>
-      <div style="flex: 50%">
-        <canvas id="age_chart"></canvas>
-      </div>
-    </div>
-    <div style="width: 90%; display: flex">
-      <div style="flex: 50%">
-        <canvas id="population_chart"></canvas>
-      </div>
-      <div style="flex: 50%">
-        <canvas id="dead_chart"></canvas>
-      </div>
-    </div>
-    <div style="width: 90%; display: flex">
-      <div style="flex: 50%">
-        <canvas id="food_phero_chart"></canvas>
-      </div>
-      <div style="flex: 50%">
-        <canvas id="home_phero_chart"></canvas>
-      </div>
-    </div>
-  </div>
-    <div style="flex: 50%" id="map"/>
+      <div style="flex: 50%" id="map" />
     </div>
 
     <br />

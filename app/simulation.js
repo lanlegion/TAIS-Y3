@@ -395,7 +395,7 @@ class Simulation {
     this.homePheroAmount = sumPheromones(this.pheromoneCells, 'home')
     //console.log('homepheros',homePheromones)
     homePheromoneStats.push(this.homePheroAmount)
-    
+
     this.dangerPheroAmount = sumPheromones(this.pheromoneCells, 'danger')
 
     // Push to charts
@@ -445,7 +445,12 @@ class Simulation {
       !ant.carryingFood
     ) {
       //console.log('dropped death phero at', currentCell.x, currentCell.y)
-      this._leavePheromone('danger', currentCell, this.config.pheromones.deathQuantity, ant.colony)
+      this._leavePheromone(
+        'danger',
+        currentCell,
+        this.config.pheromones.deathQuantity,
+        ant.colony
+      )
       this.pheromoneCells.add(currentCell)
       ant.justDied = false // TODO NOTE could also have the corpse produce death pheromone for some time
     }
@@ -461,7 +466,14 @@ class Simulation {
     const currentAmount = currentCell.getPheromone(key, colony)
     // Use top-off from paper
     if (currentAmount >= quantity) return
-    currentCell.addPheromone(key, quantity, diffusing ? 0.5 : 0.2, colony)
+    currentCell.addPheromone(
+      key,
+      quantity,
+      diffusing
+        ? this.config.pheromones.diffusionScale
+        : this.config.pheromones.dropScale,
+      colony
+    )
     if (diffusing) this.diffuseAmount += quantity
     if (currentAmount > this.maxPheromone) {
       this.maxPheromone = currentAmount
@@ -585,7 +597,8 @@ class Simulation {
    * @private
    */
   _bornAntsInColony(colonyId, colony) {
-    const fixedBirthValue = /*int(
+    const fixedBirthValue =
+      /*int(
       this.config.ants.bornPopulationPercent * colony.numberOfAnts
     )*/ this.config.ants.bornPopulationAbsolute
     /*const numOfNewAnts = this.randomIntFromInterval(
