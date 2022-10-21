@@ -420,18 +420,57 @@ class Simulation {
     this.charts.ageChart.pushData(averageAge, this.tick, isDrawing)
   }
 
+  _neighbouringCells(cell) {
+    let neighbours = []
+    for (const direction of this.directions) {
+      const currentCell = this.getCell(
+        cell.x + direction.x,
+        cell.y + direction.y
+      )
+      if (currentCell) neighbours.push(currentCell)
+    }
+    return neighbours
+  }
+
   /**
    * Leaving pheromone from ants based on its activity.
    * @param ant {Ant} the ant which leaves pheromone.
    * @param currentCell {Cell} the cell on which the ant is.
    * @param quantity {number} the quantity of pheromone which is left by the ant.
    */
-  _antLeavesPheromone(ant, currentCell, quantity = 1) {
+  _antLeavesPheromone(
+    ant,
+    currentCell,
+    quantity = this.config.pheromones.maxPheromone
+  ) {
+    function getMaxPheromone(sim, key, type) {
+      if (currentCell.type == type) {
+        //console.log('FOUND', key)
+        return quantity
+      }
+      let max = 0
+      for (const neighbourCell of sim._neighbouringCells(currentCell)) {
+        const neighbourPhero = neighbourCell.getPheromone(key, ant.colony)
+        if (neighbourPhero > max) max = neighbourPhero
+      }
+      return max
+    }
+
     if (currentCell !== null && !ant.isDead) {
       if (ant.carryingFood) {
-        this._leavePheromone('food', currentCell, quantity, ant.colony)
+        this._leavePheromone(
+          'food',
+          currentCell,
+          getMaxPheromone(this, 'food', CellType.FOOD),
+          ant.colony
+        )
       } else {
-        this._leavePheromone('home', currentCell, quantity, ant.colony)
+        this._leavePheromone(
+          'home',
+          currentCell,
+          getMaxPheromone(this, 'home', CellType.HOME),
+          ant.colony
+        )
       }
       this.pheromoneCells.add(currentCell)
     }
@@ -485,35 +524,30 @@ class Simulation {
     const newPheroCells = new Set(this.pheromoneCells)
     let logs = 0
     for (let cell of this.pheromoneCells) {
-      for (let direction of directions) {
+      for (let currentCell of this._neighbouringCells(cell)) {
         //console.log('center cell:',cell.x,',',cell.y,'neighbour:',cell.x+direction.x,cell.y+direction.y,'directions:',direction.x,direction.y)
-        const currentCell = this.getCell(
-          cell.x + direction.x,
-          cell.y + direction.y
-        )
-        if (currentCell) {
-          let changed = false
-          const pheroConfig = this.config.pheromones
-          for (let [key, diffusion] of [
-            ['food', pheroConfig.foodDiffusion],
-            ['home', pheroConfig.homeDiffusion],
-            ['danger', pheroConfig.dangerDiffusion],
-          ]) {
-            const originalAmount = cell.getPheromone(key, 0)
-            if (originalAmount && originalAmount > 0) {
-              changed = true
-              const amount = originalAmount * diffusion
 
-              /*if (logs < 10 && this.tick % 10 == 0) {
+        let changed = false
+        const pheroConfig = this.config.pheromones
+        for (let [key, diffusion] of [
+          ['food', pheroConfig.foodDiffusion],
+          ['home', pheroConfig.homeDiffusion],
+          ['danger', pheroConfig.dangerDiffusion],
+        ]) {
+          const originalAmount = cell.getPheromone(key, 0)
+          if (originalAmount && originalAmount > 0) {
+            changed = true
+            const amount = originalAmount * diffusion
+
+            /*if (logs < 10 && this.tick % 10 == 0) {
               console.log(key,currentCell.x,currentCell.y,originalAmount)
               logs++
             }*/
-              this._leavePheromone(key, currentCell, amount, 0, true)
-              //if (!this.pheromoneCells.has(currentCell))
-            }
+            this._leavePheromone(key, currentCell, amount, 0, true)
+            //if (!this.pheromoneCells.has(currentCell))
           }
-          if (changed) newPheroCells.add(currentCell)
         }
+        if (changed) newPheroCells.add(currentCell)
       }
     }
     //console.log([...newPheroCells].filter(x => !this.pheromoneCells.has(x)))
@@ -575,6 +609,10 @@ class Simulation {
     let anyAntsBorn = false
     this.colonies.forEach((colony, index) => {
       if (
+        // limit ant population to max
+        colony.numberOfAnts <=
+          this.config.ants.maxPopulation +
+            this.config.ants.bornPopulationAbsolute &&
         colony.food >= this.config.food.birthsThreshold &&
         colony.numberOfAnts > this.config.ants.minimumAntsForCreation &&
         this.tick % this.config.ants.bornInterval === 0
@@ -680,7 +718,8 @@ class Simulation {
     }
 
     this.homes.forEach((cells, index) => {
-      fill(this.colonyColors[index])
+      //fill(this.colonyColors[index])
+      fill('#8F6835')
       cells.forEach((cell) => {
         drawCell(cell, this.config.map.drawScale)
       })
@@ -693,6 +732,11 @@ class Simulation {
       })
     }
 
+    fill(this.config.map.colors.foodColor)
+    this.foods.forEach((foodCell) => {
+      drawCell(foodCell, this.config.map.drawScale)
+    })
+
     this.ants.forEach((colony, index) => {
       colony.forEach((ant) => {
         let antColor = this.colonyColors[index]
@@ -704,11 +748,6 @@ class Simulation {
         fill(antColor)
         drawCell(ant, this.config.map.drawScale)
       })
-    })
-
-    fill(this.config.map.colors.foodColor)
-    this.foods.forEach((foodCell) => {
-      drawCell(foodCell, this.config.map.drawScale)
     })
   }
 

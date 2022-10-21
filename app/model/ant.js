@@ -49,6 +49,18 @@ class Ant {
       return
     }
 
+    const currentCell = this.simulation.getCell(this.x, this.y)
+    if (this.carryingFood && currentCell.type === CellType.HOME) {
+      this.carryingFood = false
+      this.simulation.storeFood(this.colony) //, this.carryingCapacity)
+      //this.turnAround()
+    }
+    if (!this.carryingFood && currentCell.type === CellType.FOOD) {
+      this.carryingFood = true
+      this.simulation.clearFood(currentCell)
+      //this.turnAround()
+    }
+
     const forwardDirection = this.forwardDirections()[1]
     const forwardCell = simulation.getCell(
       this.x + forwardDirection.x,
@@ -74,17 +86,17 @@ class Ant {
       })
     }
 
-    // Obstacle (wall)
     if (forwardCell.type == CellType.WALL) {
+      // Added obstacle (wall)
       this.turnAround()
-    } else if (this.carryingFood && forwardCell.type === CellType.HOME) {
-      this.carryingFood = false
-      this.simulation.storeFood(this.colony, this.carryingCapacity)
-      this.turnAround()
-    } else if (!this.carryingFood && forwardCell.type === CellType.FOOD) {
-      this.carryingFood = true
-      this.simulation.clearFood(forwardCell)
-      this.turnAround()
+      /*} else if (this.carryingFood && forwardCell.type === CellType.HOME) {
+              this.carryingFood = false
+              this.simulation.storeFood(this.colony, this.carryingCapacity)
+              this.turnAround()
+            } else if (!this.carryingFood && forwardCell.type === CellType.FOOD) {
+              this.carryingFood = true
+              this.simulation.clearFood(forwardCell)
+              this.turnAround()*/
     }
 
     this.seek(!this.carryingFood)
@@ -178,20 +190,26 @@ class Ant {
     let bestDirection = forwardDirections[1]
 
     forwardDirections.forEach((direction) => {
-      const score = this.getScoreForDirection(direction, lookingForFood)
+      let score = this.getScoreForDirection(direction, lookingForFood)
+
+      /*score +=
+        (Math.random - 0.5) *
+        simulation.config.probabilities.maintainDirectionOnRandom *
+        this.simulation.config.pheromones.maxPheromone*/
+      score = Math.random
       if (score > maxScore) {
         maxScore = score
         bestDirection = direction
       }
     })
 
-    if (
+    /*if (
       maxScore < this.simulation.config.probabilities.minScoreLimit ||
       Math.random() <
         this.simulation.config.probabilities.moveRandomWhileSeeking
     ) {
       this.moveRandomly()
-    } else if (bestDirection === forwardDirections[0]) {
+    } else*/ if (bestDirection === forwardDirections[0]) {
       this.turnLeft()
     } else if (bestDirection === forwardDirections[2]) {
       this.turnRight()
@@ -209,7 +227,8 @@ class Ant {
    * @return {number}
    */
   getScoreForDirection(direction, lookingForFood) {
-    const range = simulation.config.ants.sightRange
+    let score = 0
+    /*const range = simulation.config.ants.sightRange
     const x0 = this.x + direction.x * range
     const y0 = this.y + direction.y * range
     let score = 0
@@ -220,7 +239,7 @@ class Ant {
         wScore /= dist(x0, y0, x, y) + 1 //This is the bit that's probably wrong
         score += wScore
       }
-    }
+    }*/
 
     let fwdCell = this.simulation.getCell(
       round(this.x + direction.x),
@@ -239,24 +258,38 @@ class Ant {
   getScoreForCell(cell, lookingForFood) {
     if (cell == null) {
       return 0
+    }
+    // Avoid cells with too many ants
+    if (
+      Object.entries(this.simulation.antsOnMap).length > 0 &&
+      this.simulation.antsOnMap[cell.x] &&
+      this.simulation.antsOnMap[cell.x][cell.y] &&
+      this.simulation.antsOnMap[cell.x][cell.y].length >=
+        this.simulation.config.ants.maxAtLocation
+    ) {
+      return 0
+    }
+    if (lookingForFood) {
+      /*if (cell.type === CellType.FOOD) {
+        return this.config.pheromones.maxPheromone
+      } else {*/
+      // Avoid danger pheromone when looking for food for now TODO?
+      return Math.pow(
+        this.simulation.config.selectK +
+          (cell.getPheromone('food', this.colony) -
+            cell.getPheromone('danger', this.colony)),
+        this.simulation.config.selectN
+      )
+      //}
     } else {
-      if (lookingForFood) {
-        if (cell.type === CellType.FOOD) {
-          return 100
-        } else {
-          // Avoid danger pheromone when looking for food for now TODO?
-          return (
-            cell.getPheromone('food', this.colony) -
-            cell.getPheromone('danger', this.colony)
-          )
-        }
-      } else {
-        if (cell.type === CellType.HOME) {
-          return 100
-        } else {
-          return cell.getPheromone('home', this.colony)
-        }
-      }
+      /*if (cell.type === CellType.HOME) {
+        return this.config.pheromones.maxPheromone
+      } else {*/
+      return Math.pow(
+        this.simulation.config.selectK + cell.getPheromone('home', this.colony),
+        this.simulation.config.selectN
+      )
+      //}
     }
   }
 

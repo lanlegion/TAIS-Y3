@@ -31,6 +31,8 @@ const ANT_SIM_CONFIG = {
   fps: 60, // Pretty irrelevant
   gameSpeed: 1,
   ants: {
+    maxPopulation: 1000,
+    maxAtLocation: 10,
     numberOfColonies: 1,
     antsPerColony: 2, //150,
     sightRange: 5,
@@ -39,7 +41,7 @@ const ANT_SIM_CONFIG = {
     bornPopulationPercent: 1, //0.02, //TODO: absolute 2 per timestep??
     bornPopulationAbsolute: 2,
     bornDeviation: 0, //2,
-    averageLifeSpan: 500, // Measured in ticks, old: 2000, paper: 500
+    averageLifeSpan: 200, // Measured in ticks, old: 2000, paper: 500
     lifeSpanDeviation: 0, //400, // Measured in ticks
     hitDamage: 20,
     hitDeviation: 5,
@@ -56,6 +58,7 @@ const ANT_SIM_CONFIG = {
     healingSpeed: 0.2,
   },
   pheromones: {
+    maxPheromone: 1000,
     dropScale: 1, //0.2, // portion of quantity left by an ant at once
     diffusionScale: 1, //0.5, // quantity scale during diffusion
     useDiffusion: true,
@@ -70,10 +73,12 @@ const ANT_SIM_CONFIG = {
     deathQuantity: 5,
   },
   probabilities: {
-    maintainDirectionOnRandom: 0.75,
-    moveRandomWhileSeeking: 0.2,
-    minScoreLimit: 0.01,
-    turnLeftOnRandom: 0.875,
+    selectK: 0.001,
+    selectN: 10,
+    maintainDirectionOnRandom: 0.3, //0.75,
+    moveRandomWhileSeeking: 0.3, //0.2,
+    minScoreLimit: 0, //0.01,
+    turnLeftOnRandom: 0.3, //0.875,
   },
   charts: {
     lengthThreshold: 100,
