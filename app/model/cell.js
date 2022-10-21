@@ -14,6 +14,11 @@ class Cell {
   }
 
   // added general method for adding
+  /**
+   * Adds pheromone to the cell.
+   * @param value {number} the amount of food pheromone.
+   * @param colony {number} the colony index of the pheromone.
+   */
   addPheromone(key, value, valueScale, colony) {
     if (!this.pheromones[key][colony]) {
       this.pheromones[key][colony] = 0.0
@@ -27,6 +32,11 @@ class Cell {
   }
 
   // added general method for getting
+  /**
+   * Retrieves the pheromones for a given colony.
+   * @param colony {number} the index of the colony.
+   * @return {number} the food pheromones amount.
+   */
   getPheromone(key, colony) {
     /*if (!this.pheromones[key])
       {
@@ -38,38 +48,6 @@ class Cell {
       return 0
     }
     return pheromone
-  }
-  /**
-   * Adds food pheromone to the cell.
-   * @param value {number} the amount of food pheromone.
-   * @param colony {number} the colony index of the pheromone.
-   */
-  addFoodPheromone(value, colony) {
-    if (!this.pheromones.food[colony]) {
-      this.pheromones.food[colony] = 0.0
-    }
-    this.pheromones.food[colony] += value
-  }
-
-  /**
-   * Adds home pheromone to the cell.
-   * @param value {number} the amount of home pheromone.
-   * @param colony {number} the colony index of the pheromone.
-   */
-  addHomePheromone(value, colony) {
-    if (!this.pheromones.home[colony]) {
-      this.pheromones.home[colony] = 0.0
-    }
-    this.pheromones.home[colony] += value
-  }
-
-  // TODO new danger pheromone
-  addDangerPheromone(value, colony) {
-    if (!this.pheromones.danger[colony]) {
-      this.pheromones.danger[colony] = 0.0
-    }
-    this.pheromones.danger[colony] += value
-    //console.log('added',value,'danger for a total of',this.pheromones.danger[colony])
   }
 
   /**
@@ -88,41 +66,6 @@ class Cell {
     for (let key in this.pheromones.danger) {
       this.pheromones.danger[key] *= dangerDecay
     }
-  }
-
-  /**
-   * Retrieves the food pheromones for a given colony.
-   * @param colony {number} the index of the colony.
-   * @return {number} the food pheromones amount.
-   */
-  getFoodPheromone(colony) {
-    const pheromone = this.pheromones.food[colony]
-    if (pheromone === undefined) {
-      return 0
-    }
-    return pheromone
-  }
-
-  /**
-   * Retrieves the home pheromones for a given colony.
-   * @param colony {number} the index of the colony.
-   * @return {number} the food pheromones amount.
-   */
-  getHomePheromone(colony) {
-    const pheromone = this.pheromones.home[colony]
-    if (pheromone === undefined) {
-      return 0
-    }
-    return pheromone
-  }
-
-  // TODO new danger pheromone
-  getDangerPheromone(colony) {
-    const pheromone = this.pheromones.danger[colony]
-    if (pheromone === undefined) {
-      return 0
-    }
-    return pheromone
   }
 
   /**

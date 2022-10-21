@@ -246,15 +246,15 @@ class Ant {
         } else {
           // Avoid danger pheromone when looking for food for now TODO?
           return (
-            cell.getFoodPheromone(this.colony) -
-            cell.getDangerPheromone(this.colony)
+            cell.getPheromone('food', this.colony) -
+            cell.getPheromone('danger', this.colony)
           )
         }
       } else {
         if (cell.type === CellType.HOME) {
           return 100
         } else {
-          return cell.getHomePheromone(this.colony)
+          return cell.getPheromone('home', this.colony)
         }
       }
     }
