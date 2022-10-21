@@ -1,6 +1,7 @@
 let simulation
 let isRunning = true
 let isDrawing = true
+let isCharting = true
 
 // Switches on and off the simulation
 function switchRunning() {
@@ -9,6 +10,12 @@ function switchRunning() {
 
 // Switches on and off the map rendering and charts live updates
 function switchDrawing() {
+  isDrawing = !isDrawing
+}
+
+function switchVisuals() {
+  isCharting = !isCharting
+  document.getElementById('charts').hidden = !isCharting
   isDrawing = !isDrawing
 }
 

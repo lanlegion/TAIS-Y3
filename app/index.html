@@ -23,14 +23,17 @@
   </head>
 
   <body style="margin: 20pt; background-color: rgb(233, 239, 239)">
-    <audio id="audio_container_born">
+    <!--<audio id="audio_container_born">
       <source src="sounds/born.mp3" type="audio/mpeg" />
-    </audio>
+    </audio>-->
 
     <div style="margin: 20pt">
       <button type="button" onclick="switchRunning()">START/STOP</button>
       <button type="button" onclick="switchDrawing()">
         DRAWING START/STOP
+      </button>
+      <button type="button" onclick="switchVisuals()">
+        CHARTS & DRAWING START/STOP
       </button>
       <h3>Debug stats</h3>
       <div id="debug_div"></div>
@@ -38,6 +41,7 @@
       <div id="stats_div"></div>
     </div>
 
+    <div id="charts">
     <div style="width: 100%; display: flex">
       <div style="flex: 50%">
         <div style="width: 50%; display: flex">
@@ -75,7 +79,7 @@
       </div>
       <div style="flex: 50%" id="map" />
     </div>
-
+  </div>
     <br />
   </body>
 </html>

@@ -348,7 +348,7 @@ class Simulation {
     this._decayPheromone()
     this._consumeFood()
     this._bornAnts()
-    this._updateCharts(isDrawing)
+    if (isCharting) this._updateCharts(isDrawing)
     if (this.tick % this.config.cleanupInterval === 0) {
       this._cleanup()
     }
