@@ -239,23 +239,32 @@ class Ant {
   getScoreForCell(cell, lookingForFood) {
     if (cell == null) {
       return 0
-    } else {
-      if (lookingForFood) {
-        if (cell.type === CellType.FOOD) {
-          return 100
-        } else {
-          // Avoid danger pheromone when looking for food for now TODO?
-          return (
-            cell.getPheromone('food', this.colony) -
-            cell.getPheromone('danger', this.colony)
-          )
-        }
+    }
+    // Avoid cells with too many ants
+    if (
+      Object.entries(this.simulation.antsOnMap).length > 0 &&
+      this.simulation.antsOnMap[cell.x] &&
+      this.simulation.antsOnMap[cell.x][cell.y] &&
+      this.simulation.antsOnMap[cell.x][cell.y].length >=
+        this.simulation.config.ants.maxAtLocation
+    ) {
+      return 0
+    }
+    if (lookingForFood) {
+      if (cell.type === CellType.FOOD) {
+        return 100
       } else {
-        if (cell.type === CellType.HOME) {
-          return 100
-        } else {
-          return cell.getPheromone('home', this.colony)
-        }
+        // Avoid danger pheromone when looking for food for now TODO?
+        return (
+          cell.getPheromone('food', this.colony) -
+          cell.getPheromone('danger', this.colony)
+        )
+      }
+    } else {
+      if (cell.type === CellType.HOME) {
+        return 100
+      } else {
+        return cell.getPheromone('home', this.colony)
       }
     }
   }

@@ -34,6 +34,8 @@ const ANT_SIM_CONFIG = {
   fps: 60, // Pretty irrelevant
   gameSpeed: 1,
   ants: {
+    maxPopulation: 1000,
+    maxAtLocation: 10,
     numberOfColonies: 1,
     antsPerColony: 2, //150,
     sightRange: 5, //5,
@@ -59,6 +61,8 @@ const ANT_SIM_CONFIG = {
     healingSpeed: 0.2,
   },
   pheromones: {
+    maxPheromone: 1,
+    useMax: true, // drop maximal neighbouring pheromone
     dropScale: 1, //0.2, // portion of quantity left by an ant at once
     diffusionScale: 1, //0.5, // quantity scale during diffusion
     useDiffusion: true,
