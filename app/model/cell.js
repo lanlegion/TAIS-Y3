@@ -6,10 +6,11 @@ const CellType = {
 }
 
 class Cell {
-  constructor(x, y) {
+  constructor(x, y, maxPheromone) {
     this.x = x
     this.y = y
     this.type = CellType.EMPTY
+    this.maxPheromone = maxPheromone
     this.pheromones = new Pheromones()
   }
 
@@ -46,6 +47,12 @@ class Cell {
     const pheromone = this.pheromones[key][colony]
     if (pheromone === undefined) {
       return 0
+    }
+    if (key == 'food' && this.type == CellType.FOOD ||
+    key == 'home' && this.type == CellType.HOME)
+    {
+      if (key == 'food') console.log('FOOD',this.maxPheromone)
+     return this.maxPheromone
     }
     return pheromone
   }

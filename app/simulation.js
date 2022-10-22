@@ -47,7 +47,7 @@ class Simulation {
     for (let x = 0; x < this.config.map.width; x++) {
       let row = []
       for (let y = 0; y < this.config.map.height; y++) {
-        row.push(new Cell(x, y))
+        row.push(new Cell(x, y, this.config.pheromones.maxPheromone))
       }
       this.cells.push(row)
     }
