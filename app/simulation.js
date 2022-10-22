@@ -47,7 +47,8 @@ class Simulation {
     for (let x = 0; x < this.config.map.width; x++) {
       let row = []
       for (let y = 0; y < this.config.map.height; y++) {
-        row.push(new Cell(x, y, this.config.pheromones.maxPheromone))
+        row.push(new Cell(x, y, this.config.pheromones.maxPheromone,
+           this.config.pheromones.useTopOff))
       }
       this.cells.push(row)
     }
@@ -58,7 +59,7 @@ class Simulation {
     this.homes = []
     for (let colony = 0; colony < this.config.ants.numberOfColonies; colony++) {
       let colonyHomes = []
-      this._gatRandomSquareLocations(CellType.HOME).forEach((cell) => {
+      this._gatRandomSquareLocations(CellType.HOME,this.config.map.sizes.home).forEach((cell) => {
         if (!occupiedCells.has(`${cell.x}-${cell.y}`)) {
           occupiedCells.add(`${cell.x}-${cell.y}`)
           cell.type = CellType.HOME
@@ -222,7 +223,7 @@ class Simulation {
    * @return [Cell] the list of random Cells
    * @private
    */
-  _gatRandomSquareLocations(cellType, sizes = { x: 10, y: 10 }) {
+  _gatRandomSquareLocations(cellType, sizes = { x: 5, y: 5 }) {
     let randomCells = []
     let randomLocation = {}
 
@@ -487,7 +488,7 @@ class Simulation {
       }
       let max = 0
       for (const neighbourCell of sim._neighbouringCells(currentCell)) {
-        const neighbourPhero = neighbourCell.getPheromone(key, ant.colony)
+        const neighbourPhero = neighbourCell.getPheromone(key, ant.colony, true)
         if (neighbourPhero > max) max = neighbourPhero
       }
       return max
@@ -542,7 +543,7 @@ class Simulation {
     }
     const currentAmount = currentCell.getPheromone(key, colony)
     // Use top-off from paper
-    if (currentAmount >= quantity) return
+    if (this.config.pheromones.useTopOff && currentAmount >= quantity) return
     currentCell.addPheromone(
       key,
       quantity,

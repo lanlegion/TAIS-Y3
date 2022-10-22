@@ -22,12 +22,12 @@ const ANT_SIM_CONFIG = {
       deadAntColor: '#707070',
       antWithFood: '#14f43c',
     },
-    nestPosition: { x: 10, y: 10 },
-    foodPosition: { x: 75, y: 75 },
+    nestPosition: { x: 20, y: 20 },
+    foodPosition: { x: 70, y: 70 },
     sizes: {
       home: {
-        x: 15,
-        y: 15,
+        x: 10,
+        y: 10,
       },
     },
   },
@@ -62,25 +62,26 @@ const ANT_SIM_CONFIG = {
   },
   pheromones: {
     maxPheromone: 1,
-    useMax: true, // drop maximal neighbouring pheromone
+    useTopOff: true,
+    useMax: true, // NOTE: should be used with top off | drop maximal neighbouring pheromone
     dropScale: 1, //0.2, // portion of quantity left by an ant at once
-    diffusionScale: 1, //0.5, // quantity scale during diffusion
+    diffusionScale: 0.01, //1, //0.5, // quantity scale during diffusion
     useDiffusion: true,
     foodDiffusion: 0.01,
     homeDiffusion: 0.01,
     dangerDiffusion: 0.5,
     foodDecay: 0.94,
     homeDecay: 0.94,
-    dangerDecay: 0.98, // added danger decay
+    dangerDecay: 0.94, // added danger decay
     existingLimit: 0, //0.0001, //0.06
     useDanger: true, // added danger switch
-    deathQuantity: 0.5,
+    deathQuantity: 3,
   },
   probabilities: {
-    maintainDirectionOnRandom: 0.75,
-    moveRandomWhileSeeking: 0.2,
-    minScoreLimit: 0.01,
-    turnLeftOnRandom: 0.875,
+    maintainDirectionOnRandom: 0.5,
+    moveRandomWhileSeeking: 0.1,
+    minScoreLimit: 0, //0.01,
+    turnLeftOnRandom: 0.5,
   },
   charts: {
     lengthThreshold: 100,

@@ -6,11 +6,12 @@ const CellType = {
 }
 
 class Cell {
-  constructor(x, y, maxPheromone) {
+  constructor(x, y, maxPheromone, useTopOff = false) {
     this.x = x
     this.y = y
     this.type = CellType.EMPTY
     this.maxPheromone = maxPheromone
+    this.useTopOff = useTopOff
     this.pheromones = new Pheromones()
   }
 
@@ -24,12 +25,15 @@ class Cell {
     if (!this.pheromones[key][colony]) {
       this.pheromones[key][colony] = 0.0
     }
-    //this.pheromones[key][colony] += value
-    // top-off
-    this.pheromones[key][colony] = Math.min(
-      this.pheromones[key][colony] + valueScale * value,
-      value
-    )
+    if (!this.useTopOff) {
+      this.pheromones[key][colony] += value
+    } else {
+      // top-off
+      this.pheromones[key][colony] = Math.min(
+        this.pheromones[key][colony] + valueScale * value,
+        value
+      )
+    }
   }
 
   // added general method for getting
@@ -38,17 +42,19 @@ class Cell {
    * @param colony {number} the index of the colony.
    * @return {number} the food pheromones amount.
    */
-  getPheromone(key, colony) {
+  getPheromone(key, colony, ant = false) {
     /*if (!this.pheromones[key])
       {
         console.log('ERROR no',key)
         return 0
       }*/
-    if (key == 'food' && this.type == CellType.FOOD ||
-    key == 'home' && this.type == CellType.HOME)
-    {
-      if (key == 'food') console.log('FOOD',this.maxPheromone)
-     return this.maxPheromone
+    if (
+      ant &&
+      ((key == 'food' && this.type == CellType.FOOD) ||
+        (key == 'home' && this.type == CellType.HOME))
+    ) {
+      if (key == 'food') console.log('FOOD', this.maxPheromone)
+      return this.maxPheromone
     }
     const pheromone = this.pheromones[key][colony]
     if (pheromone === undefined) {

@@ -15,7 +15,6 @@ class Ant {
     this.simulation = simulation
     this.x = x
     this.y = y
-    this.angle = 0
     this.colony = colony
     this.colonyStats = colonyStats
     this.carryingFood = false
@@ -23,7 +22,6 @@ class Ant {
     this.health = health
     this.maxHealth = health
     this.hungerSpeed = hungerSpeed
-    this.angle = 0
     this.directions = [
       { x: 0, y: -1 },
       { x: 1, y: -1 },
@@ -34,6 +32,7 @@ class Ant {
       { x: -1, y: 0 },
       { x: -1, y: -1 },
     ]
+    this.angle = Math.floor(Math.random() * this.directions.length)
     this.starveSpeed = starveSpeed
     this.healingSpeed = healingSpeed
     this.lifeSpan = lifeSpan
@@ -159,7 +158,7 @@ class Ant {
     ) {
       this.x += fwd.x * simulation.config.gameSpeed
       this.y += fwd.y * simulation.config.gameSpeed
-    } else if (probability < simulation.config.probabilities.turnLeftOnRandom) {
+    } else if (Math.random() < simulation.config.probabilities.turnLeftOnRandom) {
       this.turnLeft()
     } else {
       this.turnRight()
