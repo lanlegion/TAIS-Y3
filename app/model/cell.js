@@ -44,15 +44,15 @@ class Cell {
         console.log('ERROR no',key)
         return 0
       }*/
-    const pheromone = this.pheromones[key][colony]
-    if (pheromone === undefined) {
-      return 0
-    }
     if (key == 'food' && this.type == CellType.FOOD ||
     key == 'home' && this.type == CellType.HOME)
     {
       if (key == 'food') console.log('FOOD',this.maxPheromone)
      return this.maxPheromone
+    }
+    const pheromone = this.pheromones[key][colony]
+    if (pheromone === undefined) {
+      return 0
     }
     return pheromone
   }

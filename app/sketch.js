@@ -56,6 +56,14 @@ function setup() {
     ANT_SIM_CONFIG.charts.aggregationSize
   )
 
+  const dangerPheromoneChart = new AntsChart(
+    ANT_SIM_CONFIG.ants.numberOfColonies,
+    ANT_SIM_CONFIG.map.colors.colony,
+    'death_phero_chart',
+    'Death pheromone',
+    ANT_SIM_CONFIG.charts.lengthThreshold,
+    ANT_SIM_CONFIG.charts.aggregationSize
+  )
   // Added total food chart
   /*const totalFoodChart = new AntsChart(
     ANT_SIM_CONFIG.ants.numberOfColonies,
@@ -75,14 +83,14 @@ function setup() {
     ANT_SIM_CONFIG.charts.aggregationSize
   )
 
-  const healthChart = new AntsChart(
+  /*const healthChart = new AntsChart(
     ANT_SIM_CONFIG.ants.numberOfColonies,
     ANT_SIM_CONFIG.map.colors.colony,
     'health_chart',
     'Health',
     ANT_SIM_CONFIG.charts.lengthThreshold,
     ANT_SIM_CONFIG.charts.aggregationSize
-  )
+  )*/
 
   const populationChart = new AntsChart(
     ANT_SIM_CONFIG.ants.numberOfColonies,
@@ -114,9 +122,10 @@ function setup() {
   const charts = {
     foodPheromones: foodPheromoneChart,
     homePheromones: homePheromoneChart,
+    dangerPheromones: dangerPheromoneChart,
     //totalFoodChart: totalFoodChart,
     foodChart: foodChart,
-    healthChart: healthChart,
+    //healthChart: healthChart,
     populationChart: populationChart,
     deadChart: deadChart,
     ageChart: ageChart,

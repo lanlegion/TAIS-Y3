@@ -370,9 +370,10 @@ class Simulation {
     // TODO refactor
     let foodPheromoneStats = []
     let homePheromoneStats = []
+    let dangerPheromoneStats = []
     //let totalFoodCurrentStats = []
     let foodCurrentStats = []
-    let healthCurrentStats = []
+    //let healthCurrentStats = []
     let populationCurrentStats = []
     let deadCurrentStats = []
     let averageAge = []
@@ -382,7 +383,7 @@ class Simulation {
         // TODO refactor
         //totalFoodCurrentStats.push(null)
         foodCurrentStats.push(null)
-        healthCurrentStats.push(null)
+        //healthCurrentStats.push(null)
         populationCurrentStats.push(null)
         deadCurrentStats.push(null)
         averageAge.push(null)
@@ -390,7 +391,7 @@ class Simulation {
         //console.log('total food',this.colonies[colony].totalFood)
         //totalFoodCurrentStats.push(this.colonies[colony].totalFood)
         foodCurrentStats.push(this.colonies[colony].food)
-        healthCurrentStats.push(this.colonies[colony].averageHealth)
+        //healthCurrentStats.push(this.colonies[colony].averageHealth)
         populationCurrentStats.push(this.colonies[colony].numberOfAnts)
         deadCurrentStats.push(this.colonies[colony].numberOfDeadAnts)
         averageAge.push(this.colonies[colony].averageAge)
@@ -427,6 +428,7 @@ class Simulation {
     homePheromoneStats.push(this.homePheroAmount)
 
     this.dangerPheroAmount = sumPheromones(this.pheromoneCells, 'danger')
+    dangerPheromoneStats.push(this.dangerPheroAmount)
 
     // Push to charts
     this.charts.foodPheromones.pushData(
@@ -439,8 +441,13 @@ class Simulation {
       this.tick,
       isDrawing
     )
+    this.charts.dangerPheromones.pushData(
+      dangerPheromoneStats,
+      this.tick,
+      isDrawing
+    )
     this.charts.foodChart.pushData(foodCurrentStats, this.tick, isDrawing)
-    this.charts.healthChart.pushData(healthCurrentStats, this.tick, isDrawing)
+    //this.charts.healthChart.pushData(healthCurrentStats, this.tick, isDrawing)
     this.charts.populationChart.pushData(
       populationCurrentStats,
       this.tick,

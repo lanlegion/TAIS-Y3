@@ -38,7 +38,7 @@ const ANT_SIM_CONFIG = {
     maxAtLocation: 10,
     numberOfColonies: 1,
     antsPerColony: 2, //150,
-    sightRange: 5, //5,
+    sightRange: 0,//5,
     maxHealth: 100,
     bornInterval: 1, // Measured in ticks
     bornPopulationPercent: 1, //0.02, //TODO: absolute 2 per timestep??
@@ -74,7 +74,7 @@ const ANT_SIM_CONFIG = {
     dangerDecay: 0.98, // added danger decay
     existingLimit: 0, //0.0001, //0.06
     useDanger: true, // added danger switch
-    deathQuantity: 5,
+    deathQuantity: 0.5,
   },
   probabilities: {
     maintainDirectionOnRandom: 0.75,
