@@ -53,7 +53,7 @@ const ANT_SIM_CONFIG = {
   },
   food: {
     numberOfFoodStacks: 3, //30,
-    foodStackSize: 20, //20,
+    foodStackSize: 10, //20,
     foodItemValue: 1,
     antHunger: 0, // How much food an ant will eat at each tick
     birthsThreshold: 0, // Minimum amount of food that a colony must have to multiply

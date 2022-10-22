@@ -89,6 +89,10 @@ class Ant {
     }
 
     this.seek(!this.carryingFood)
+    
+    let fwd = this.forward()
+    this.x += fwd.x * simulation.config.gameSpeed
+    this.y += fwd.y * simulation.config.gameSpeed
   }
 
   /**
@@ -158,8 +162,8 @@ class Ant {
     if (
       probability < simulation.config.probabilities.maintainDirectionOnRandom
     ) {
-      this.x += fwd.x * simulation.config.gameSpeed
-      this.y += fwd.y * simulation.config.gameSpeed
+      /*this.x += fwd.x * simulation.config.gameSpeed
+      this.y += fwd.y * simulation.config.gameSpeed*/
     } else if (Math.random() < simulation.config.probabilities.turnLeftOnRandom) {
       this.turnLeft()
     } else {
@@ -196,10 +200,10 @@ class Ant {
       this.turnLeft()
     } else if (bestDirection === forwardDirections[2]) {
       this.turnRight()
-    } else {
+    } /*else {
       this.x += bestDirection.x
       this.y += bestDirection.y
-    }
+    }*/
   }
 
   /**
