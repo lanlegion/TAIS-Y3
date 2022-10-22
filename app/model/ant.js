@@ -58,6 +58,7 @@ class Ant {
       return
     }
 
+/* Ant fighting
     if (
       this.simulation.antsOnMap[forwardCell.x] !== undefined &&
       this.simulation.antsOnMap[forwardCell.x][forwardCell.y] !== undefined
@@ -71,7 +72,7 @@ class Ant {
           ant.receiveDamage(currentDamageHit)
         }
       })
-    }
+    }*/
 
     // Obstacle (wall)
     if (forwardCell.type == CellType.WALL) {
@@ -82,7 +83,8 @@ class Ant {
       this.turnAround()
     } else if (!this.carryingFood && forwardCell.type === CellType.FOOD) {
       this.carryingFood = true
-      this.simulation.clearFood(forwardCell)
+      // Don't clear food: infinite food source!
+      //this.simulation.clearFood(forwardCell)
       this.turnAround()
     }
 
