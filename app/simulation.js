@@ -653,7 +653,7 @@ class Simulation {
           this.config.ants.maxPopulation +
             this.config.ants.bornPopulationAbsolute &&
         colony.food >= this.config.food.birthsThreshold &&
-        colony.numberOfAnts > this.config.ants.minimumAntsForCreation &&
+        colony.numberOfAnts >= this.config.ants.minimumAntsForCreation &&
         this.tick % this.config.ants.bornInterval === 0
       ) {
         this._bornAntsInColony(index, colony)

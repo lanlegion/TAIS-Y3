@@ -37,8 +37,8 @@ const ANT_SIM_CONFIG = {
     maxPopulation: 1000,
     maxAtLocation: 10,
     numberOfColonies: 1,
-    antsPerColony: 2, //150,
-    sightRange: 0,//5,
+    antsPerColony: 2,//2, //150,
+    sightRange: 2,//5,
     maxHealth: 100,
     bornInterval: 1, // Measured in ticks
     bornPopulationPercent: 1, //0.02, //TODO: absolute 2 per timestep??
@@ -78,8 +78,8 @@ const ANT_SIM_CONFIG = {
     deathQuantity: 3,
   },
   probabilities: {
-    maintainDirectionOnRandom: 0.5,
-    moveRandomWhileSeeking: 0.1,
+    maintainDirectionOnRandom: 0.33,
+    moveRandomWhileSeeking: 0.5,
     minScoreLimit: 0, //0.01,
     turnLeftOnRandom: 0.5,
   },

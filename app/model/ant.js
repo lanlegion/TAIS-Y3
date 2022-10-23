@@ -190,13 +190,7 @@ class Ant {
       }
     })
 
-    if (
-      maxScore < this.simulation.config.probabilities.minScoreLimit ||
-      Math.random() <
-        this.simulation.config.probabilities.moveRandomWhileSeeking
-    ) {
-      this.moveRandomly()
-    } else if (bestDirection === forwardDirections[0]) {
+    if (bestDirection === forwardDirections[0]) {
       this.turnLeft()
     } else if (bestDirection === forwardDirections[2]) {
       this.turnRight()
@@ -204,6 +198,15 @@ class Ant {
       this.x += bestDirection.x
       this.y += bestDirection.y
     }*/
+    // nudge direction randomly
+    
+    if (
+      maxScore < this.simulation.config.probabilities.minScoreLimit ||
+      Math.random() <
+        this.simulation.config.probabilities.moveRandomWhileSeeking
+    ) {
+      this.moveRandomly()
+    }
   }
 
   /**
