@@ -28,6 +28,7 @@ class Simulation {
     this.antsOnMap = {}
 
     this.tick = 0
+    this.done = false
 
     let occupiedCells = new Set()
     this._initCells()
@@ -317,7 +318,11 @@ class Simulation {
    * Executes one tick of the simulation.
    */
   run(isDrawing) {
-    if (this.tick >= this.config.simTime) return // stop if sim time is over
+    if (this.tick >= this.config.simTime) 
+    {
+      this.done = true
+      return // stop if sim time is over
+    }
     let newAntsOnMap = {}
     this.tick++
     this.ants.forEach((colony, index) => {
@@ -495,8 +500,8 @@ class Simulation {
     }
     const useMax = this.config.pheromones.useMax
 
+    let changed = false
     if (currentCell !== null && !ant.isDead) {
-      let changed = false
       if (ant.carryingFood) {
         changed = this._leavePheromone(
           'food',

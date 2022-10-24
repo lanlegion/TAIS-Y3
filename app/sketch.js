@@ -1,7 +1,37 @@
 let simulation
+let uiComponents
+let charts
 let isRunning = true
 let isDrawing = true
 let isCharting = true
+let parameterName
+let parameters
+const parameterRanges = {
+  'Death diffusion': [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0], //paramsInRange(0.0, 1.0, 10),
+  'Death evaporation': [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0], //paramsInRange(0.0, 1.0, 10),
+  'Death quantity': [0,1,2,3,4,5,6,7,8,9,10], //paramsInRange(0.0, 10.0, 10),
+  'Ant lifetime': [100,200,300,400,500,600,700,800,900,1000], //paramsInRange(0, 1000, 10),
+}
+let simulationIndex = 0
+
+function paramsInRange(min, max, steps) {
+  let arr = []
+  for (let i = min; i <= max; i += (max - min) / steps) {
+    arr.push(i)
+  }
+  console.log('generated arguments', arr)
+  return arr
+}
+
+function useParameters() {
+  if (!ANT_SIM_CONFIG.bulk) return
+  const paramMenu = document.getElementById('params')
+  const name = paramMenu.options[paramMenu.selectedIndex].value
+  parameterName = name
+  console.log(name)
+  parameters = parameterRanges[parameterName]
+  console.log('found parameters', parameters, 'for', parameterName)
+}
 
 // Switches on and off the simulation
 function switchRunning() {
@@ -20,23 +50,23 @@ function switchVisuals() {
 }
 
 function setup() {
-  let renderer =createCanvas(
+  let renderer = createCanvas(
     ANT_SIM_CONFIG.map.width * ANT_SIM_CONFIG.map.drawScale,
     ANT_SIM_CONFIG.map.height * ANT_SIM_CONFIG.map.drawScale
   )
-  renderer.parent("map");
+  renderer.parent('map')
   frameRate(ANT_SIM_CONFIG.fps)
 
   const audioContainers = {
     born: document.getElementById('audio_container_born'),
   }
 
-  const uiComponents = new UiComponents(
+  uiComponents = new UiComponents(
     select('#stats_div'),
     select('#debug_div'),
     audioContainers
   )
-  
+
   // Added pheromone charts
   const foodPheromoneChart = new AntsChart(
     ANT_SIM_CONFIG.ants.numberOfColonies,
@@ -46,7 +76,7 @@ function setup() {
     ANT_SIM_CONFIG.charts.lengthThreshold,
     ANT_SIM_CONFIG.charts.aggregationSize
   )
-  
+
   const homePheromoneChart = new AntsChart(
     ANT_SIM_CONFIG.ants.numberOfColonies,
     ANT_SIM_CONFIG.map.colors.colony,
@@ -119,7 +149,7 @@ function setup() {
     ANT_SIM_CONFIG.charts.aggregationSize
   )
 
-  const charts = {
+  charts = {
     foodPheromones: foodPheromoneChart,
     homePheromones: homePheromoneChart,
     dangerPheromones: dangerPheromoneChart,
@@ -131,12 +161,53 @@ function setup() {
     ageChart: ageChart,
   }
 
+  if (ANT_SIM_CONFIG.bulk) {
+    // don't start running and drawing when doing bulk experiments
+    isRunning = false
+    isDrawing = false
+    select('#parameter').html('Simulation not running yet')
+  } else {
+    document.getElementById('menu').hidden = true
+    newSimulation()
+  }
+}
+
+function startBulk() {
+  useParameters()
+  newSimulation()
+  isRunning = true
+}
+
+function newSimulation() {
+  if (ANT_SIM_CONFIG.bulk) {
+    const argument = parameters[simulationIndex]
+    switch (parameterName) {
+      case 'Death diffusion':
+        ANT_SIM_CONFIG.pheromones.dangerDiffusion = argument
+        break
+      case 'Death evaporation':
+        ANT_SIM_CONFIG.pheromones.dangerDecay = argument
+        break
+      case 'Death quantity':
+        ANT_SIM_CONFIG.pheromones.deathQuantity = argument
+        break
+      case 'Ant lifetime':
+        ANT_SIM_CONFIG.ants.averageLifeSpan = argument
+        break
+    }
+    simulationIndex++
+    select('#parameter').html(parameterName + ' ' + argument + '<br>')
+  }
   simulation = new Simulation(ANT_SIM_CONFIG, uiComponents, charts)
+  select('#config').html(ANT_SIM_CONFIG)
 }
 
 function draw() {
   if (isRunning) {
     simulation.run(isDrawing)
     simulation.draw(isDrawing)
+    if (ANT_SIM_CONFIG.bulk && simulation.done) {
+      newSimulation()
+    }
   }
 }

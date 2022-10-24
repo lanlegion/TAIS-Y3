@@ -39,6 +39,21 @@
       <div id="debug_div"></div>
       <h3>Simulation stats</h3>
       <div id="stats_div"></div>
+      
+      <div id ="menu">
+        <label for="params">Choose a parameter:</label>
+        <select name="params" id="params" onChange = "useParameters()">
+          <option value="Death diffusion">Death pheromone diffusion</option>
+          <option value="Death evaporation">Death pheromone evaporation</option>
+          <option value="Death quantity">Death pheromone quantity</option>
+          <!--<<option value="Death diffusion">Death diffusion</option>
+          option value="Evaporation">Food/home evaporation</option>
+          <option value="Evaporation">Evaporation</option>-->
+          <option value="Ant lifetime">Ant lifetime</option>
+        </select>
+        <button type="button" onclick="startBulk()">START BULK SIMULATION</button>
+      </div>
+      <div id="parameter"/>
     </div>
 
     <div id="charts">
@@ -85,5 +100,6 @@
     </div>
   </div>
     <br />
+    <div id="config"/>
   </body>
 </html>
