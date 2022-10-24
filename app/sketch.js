@@ -214,8 +214,8 @@ function draw() {
           ' food: ' +
           simulation.colonies[0].food.toFixed(2) 
       )
-      if (simulationIndex <= parameters.length - 1)
-        newSimulation()
+      //console.log(simulationIndex)
+      newSimulation()
     }
   }
 }
