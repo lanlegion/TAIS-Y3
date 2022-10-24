@@ -1,6 +1,6 @@
 const ANT_SIM_CONFIG = {
   bulk: true,
-  simTime: 5000, //5000, // In ticks
+  simTime: 50, //5000, // In ticks
   map: {
     randomLocations: false,
     obstacles: false,
