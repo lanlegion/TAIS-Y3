@@ -496,22 +496,23 @@ class Simulation {
     const useMax = this.config.pheromones.useMax
 
     if (currentCell !== null && !ant.isDead) {
+      let changed = false
       if (ant.carryingFood) {
-        this._leavePheromone(
+        changed = this._leavePheromone(
           'food',
           currentCell,
           useMax ? getMaxPheromone(this, 'food', CellType.FOOD) : quantity,
           ant.colony
         )
       } else {
-        this._leavePheromone(
+        changed = this._leavePheromone(
           'home',
           currentCell,
           useMax ? getMaxPheromone(this, 'home', CellType.HOME) : quantity,
           ant.colony
         )
       }
-      this.pheromoneCells.add(currentCell)
+      if (changed) this.pheromoneCells.add(currentCell)
     }
     // danger pheromone, left in the cell when the ant dies
     // and isn't holding food
@@ -523,13 +524,13 @@ class Simulation {
       !ant.carryingFood
     ) {
       //console.log('dropped death phero at', currentCell.x, currentCell.y)
-      this._leavePheromone(
+      changed = this._leavePheromone(
         'danger',
         currentCell,
         this.config.pheromones.deathQuantity,
         ant.colony
       )
-      this.pheromoneCells.add(currentCell)
+      if (changed) this.pheromoneCells.add(currentCell)
       ant.justDied = false // TODO NOTE could also have the corpse produce death pheromone for some time
     }
   }
@@ -539,11 +540,11 @@ class Simulation {
     if (quantity <= 0) {
       // no pheromone actually added
       //console.log('negative',key,'pheromone:',quantity)
-      return
+      return false
     }
     const currentAmount = currentCell.getPheromone(key, colony)
     // Use top-off from paper
-    if (this.config.pheromones.useTopOff && currentAmount >= quantity) return
+    if (this.config.pheromones.useTopOff && currentAmount >= quantity) return false
     currentCell.addPheromone(
       key,
       quantity,
@@ -556,6 +557,7 @@ class Simulation {
     if (currentAmount > this.maxPheromone) {
       this.maxPheromone = currentAmount
     }
+    return true
   }
 
   // Added pheromone diffusion
