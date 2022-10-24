@@ -1,4 +1,6 @@
 const ANT_SIM_CONFIG = {
+  nothing: 0, // Doesn't do anything, is for doing multiple runs
+  runs: 5,
   bulk: true,
   simTime: 1000, //5000, // In ticks
   map: {

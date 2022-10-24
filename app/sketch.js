@@ -8,9 +8,18 @@ let parameterName
 let parameters
 const parameterRanges = {
   'Death diffusion': [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], //paramsInRange(0.0, 1.0, 10),
-  'Death evaporation': [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], //paramsInRange(0.0, 1.0, 10),
+  'Death evaporation': [
+    0.99, 0.94, 0.89, 0.84, 0.79, 0.74, 0.69, 0.64, 0.59, 0.54,
+  ], // 0.49,  ], //paramsInRange(0.0, 1.0, 10),
   'Death quantity': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], //paramsInRange(0.0, 10.0, 10),
   'Ant lifetime': [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], //paramsInRange(0, 1000, 10),
+  Nothing: [0],
+}
+const standardParams = {
+  'Death diffusion': [0.5],
+  'Death evaporation': [0.94],
+  'Death quantity': [3],
+  'Ant lifetime': [500],
 }
 let simulationIndex = 0
 
@@ -29,7 +38,17 @@ function useParameters() {
   const name = paramMenu.options[paramMenu.selectedIndex].value
   parameterName = name
   console.log(name)
+
   parameters = parameterRanges[parameterName]
+
+  let replParameters = [] // replicate parameters for runs
+  for (param of parameters) {
+    for (let run = 0; run < ANT_SIM_CONFIG.runs; run++) {
+      replParameters.push(param)
+    }
+  }
+
+  parameters = replParameters
   console.log('found parameters', parameters, 'for', parameterName)
 }
 
@@ -179,7 +198,7 @@ function startBulk() {
 }
 
 function newSimulation() {
-  if (ANT_SIM_CONFIG.bulk ) {
+  if (ANT_SIM_CONFIG.bulk) {
     const argument = parameters[simulationIndex]
     switch (parameterName) {
       case 'Death diffusion':
@@ -194,10 +213,17 @@ function newSimulation() {
       case 'Ant lifetime':
         ANT_SIM_CONFIG.ants.averageLifeSpan = argument
         break
+      case 'Nothing':
+        ANT_SIM_CONFIG.nothing = argument
+        break
     }
     simulationIndex++
     select('#parameter').html(
-      document.getElementById('parameter').innerHTML + '<br>' + parameterName + ' ' + argument
+      document.getElementById('parameter').innerHTML +
+        '<br>' +
+        parameterName +
+        ' ' +
+        argument
     )
   }
   simulation = new Simulation(ANT_SIM_CONFIG, uiComponents, charts)
@@ -208,11 +234,15 @@ function draw() {
   if (isRunning) {
     simulation.run(isDrawing)
     simulation.draw(isDrawing)
-    if (ANT_SIM_CONFIG.bulk && simulation.done && simulationIndex <= parameters.length) {
+    if (
+      ANT_SIM_CONFIG.bulk &&
+      simulation.done &&
+      simulationIndex <= parameters.length
+    ) {
       select('#parameter').html(
         document.getElementById('parameter').innerHTML +
           ' food: ' +
-          simulation.colonies[0].food.toFixed(2) 
+          simulation.colonies[0].food.toFixed(2)
       )
       //console.log(simulationIndex)
       newSimulation()

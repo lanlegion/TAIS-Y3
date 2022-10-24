@@ -39,10 +39,10 @@
       <div id="debug_div"></div>
       <h3>Simulation stats</h3>
       <div id="stats_div"></div>
-      
-      <div id ="menu">
+
+      <div id="menu">
         <label for="params">Choose a parameter:</label>
-        <select name="params" id="params" onChange = "useParameters()">
+        <select name="params" id="params" onChange="useParameters()">
           <option value="Death diffusion">Death pheromone diffusion</option>
           <option value="Death evaporation">Death pheromone evaporation</option>
           <option value="Death quantity">Death pheromone quantity</option>
@@ -50,56 +50,58 @@
           option value="Evaporation">Food/home evaporation</option>
           <option value="Evaporation">Evaporation</option>-->
           <option value="Ant lifetime">Ant lifetime</option>
+          <option value="Nothing">Nothing</option>
         </select>
-        <button type="button" onclick="startBulk()">START BULK SIMULATION</button>
+        <button type="button" onclick="startBulk()">
+          START BULK SIMULATION
+        </button>
       </div>
-      <div id="parameter"/>
+      <div id="parameter" />
     </div>
 
     <div id="charts">
-    <div style="width: 100%; display: flex">
-      <div style="flex: 90%">
-        
-        <div style="width: 90%; display: flex">
-          <!--<div style="flex: 50%">
+      <div style="width: 100%; display: flex">
+        <div style="flex: 90%">
+          <div style="width: 90%; display: flex">
+            <!--<div style="flex: 50%">
         <canvas id="total_food_chart"></canvas>
       </div>-->
-          <div style="flex: 50%">
-            <canvas id="dead_chart"></canvas>
+            <div style="flex: 50%">
+              <canvas id="dead_chart"></canvas>
+            </div>
+            <div style="flex: 50%">
+              <canvas id="population_chart"></canvas>
+            </div>
           </div>
-          <div style="flex: 50%">
-            <canvas id="population_chart"></canvas>
-          </div>
-        </div>
-        
-        <div style="width: 90%; display: flex">
-          <div style="flex: 50%">
-            <canvas id="food_phero_chart"></canvas>
-          </div>
-          <div style="flex: 50%">
-            <canvas id="home_phero_chart"></canvas>
-          </div>
-          <div style="flex: 50%">
-            <canvas id="death_phero_chart"></canvas>
-          </div>
-        </div>
 
-        <div style="width: 50%; display: flex">
-          <!--<div style="flex: 50%">
+          <div style="width: 90%; display: flex">
+            <div style="flex: 50%">
+              <canvas id="food_phero_chart"></canvas>
+            </div>
+            <div style="flex: 50%">
+              <canvas id="home_phero_chart"></canvas>
+            </div>
+            <div style="flex: 50%">
+              <canvas id="death_phero_chart"></canvas>
+            </div>
+          </div>
+
+          <div style="width: 50%; display: flex">
+            <!--<div style="flex: 50%">
             <canvas id="health_chart"></canvas>
           </div>-->
-          <!--<div style="flex: 50%">
+            <!--<div style="flex: 50%">
             <canvas id="age_chart"></canvas>
           </div>-->
-          <div style="flex: 50%">
-            <canvas id="food_chart"></canvas>
+            <div style="flex: 50%">
+              <canvas id="food_chart"></canvas>
+            </div>
           </div>
         </div>
+        <div style="flex: 50%" id="map" />
       </div>
-      <div style="flex: 50%" id="map" />
     </div>
-  </div>
     <br />
-    <div id="config"/>
+    <div id="config" />
   </body>
 </html>
