@@ -208,13 +208,14 @@ function draw() {
   if (isRunning) {
     simulation.run(isDrawing)
     simulation.draw(isDrawing)
-    if (ANT_SIM_CONFIG.bulk && simulation.done && simulationIndex <= parameters.length - 1) {
+    if (ANT_SIM_CONFIG.bulk && simulation.done && simulationIndex <= parameters.length) {
       select('#parameter').html(
         document.getElementById('parameter').innerHTML +
           ' food: ' +
           simulation.colonies[0].food.toFixed(2) 
       )
-      newSimulation()
+      if (simulationIndex <= parameters.length - 1)
+        newSimulation()
     }
   }
 }
