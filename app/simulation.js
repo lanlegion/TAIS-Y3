@@ -382,7 +382,7 @@ class Simulation {
     //let healthCurrentStats = []
     let populationCurrentStats = []
     let deadCurrentStats = []
-    let averageAge = []
+    //let averageAge = []
 
     for (let colony = 0; colony < this.colonies.length; colony++) {
       if (this.colonies[colony].numberOfAnts === 0) {
@@ -392,7 +392,7 @@ class Simulation {
         //healthCurrentStats.push(null)
         populationCurrentStats.push(null)
         deadCurrentStats.push(null)
-        averageAge.push(null)
+        //averageAge.push(null)
       } else {
         //console.log('total food',this.colonies[colony].totalFood)
         //totalFoodCurrentStats.push(this.colonies[colony].totalFood)
@@ -400,7 +400,7 @@ class Simulation {
         //healthCurrentStats.push(this.colonies[colony].averageHealth)
         populationCurrentStats.push(this.colonies[colony].numberOfAnts)
         deadCurrentStats.push(this.colonies[colony].numberOfDeadAnts)
-        averageAge.push(this.colonies[colony].averageAge)
+        //averageAge.push(this.colonies[colony].averageAge)
       }
     }
     // Update pheromone charts data
@@ -460,7 +460,7 @@ class Simulation {
       isDrawing
     )
     this.charts.deadChart.pushData(deadCurrentStats, this.tick, isDrawing)
-    this.charts.ageChart.pushData(averageAge, this.tick, isDrawing)
+    //this.charts.ageChart.pushData(averageAge, this.tick, isDrawing)
   }
 
   _neighbouringCells(cell) {

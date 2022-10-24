@@ -140,14 +140,14 @@ function setup() {
     ANT_SIM_CONFIG.charts.aggregationSize
   )
 
-  const ageChart = new AntsChart(
+  /*const ageChart = new AntsChart(
     ANT_SIM_CONFIG.ants.numberOfColonies,
     ANT_SIM_CONFIG.map.colors.colony,
     'age_chart',
     'Average age',
     ANT_SIM_CONFIG.charts.lengthThreshold,
     ANT_SIM_CONFIG.charts.aggregationSize
-  )
+  )*/
 
   charts = {
     foodPheromones: foodPheromoneChart,
@@ -158,7 +158,7 @@ function setup() {
     //healthChart: healthChart,
     populationChart: populationChart,
     deadChart: deadChart,
-    ageChart: ageChart,
+    //ageChart: ageChart,
   }
 
   if (ANT_SIM_CONFIG.bulk) {
